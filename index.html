@@ -167,9 +167,12 @@
                     <div class="font-black text-[#1e3a8a] text-lg md:text-xl leading-tight">
                         <span class="text-[#3eb4c8] font-black mr-1 text-2xl">|</span> BOOKINGS<br>MANAGEMENT
                     </div>
-                    <button id="tetrisBtn" onclick="window.toggleTetrisMode()" class="bg-gray-300 text-gray-600 font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105">
-                        <i class="fa-solid fa-cube text-base"></i> テトリスモードをONにする
-                    </button>
+                    <div class="text-right">
+                        <p class="text-[9px] md:text-[10px] text-pink-500 font-bold mb-1 mr-1 tracking-widest"><i class="fa-brands fa-instagram"></i> ぽっかり空いた枠をSNSへ！</p>
+                        <button id="tetrisBtn" onclick="window.toggleTetrisMode()" class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50">
+                            <i class="fa-solid fa-camera-retro text-base"></i> テトリスモード（SNS集客用）
+                        </button>
+                    </div>
                 </div>
 
                 <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-8 max-w-lg mx-auto">
@@ -196,7 +199,7 @@
                 <input type="tel" id="custTel" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="電話番号（ハイフンなし可）" inputmode="tel" autocomplete="tel">
                 <input type="email" id="custEmail" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="メールアドレス（任意）" autocomplete="email">
                 
-                <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none">
+                <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none cursor-pointer">
                     <option value="" disabled selected>当店を知ったきっかけ（任意）</option>
                     <option value="Instagram">Instagram等のSNS</option>
                     <option value="Google・マップ検索">Google・マップ検索</option>
@@ -288,7 +291,6 @@
         let selectedDate = ""; 
         let selectedTime = ""; 
         
-        // ★ テトリスモード用変数とグラフ用変数
         let isTetrisMode = false;
         let myChart = null;
 
@@ -469,17 +471,17 @@
             });
         };
 
-        // ★ テトリスモードのON/OFF
+        // ★ テトリスモード（SNS集客特化用）のON/OFF
         window.toggleTetrisMode = () => {
             isTetrisMode = !isTetrisMode;
             const btn = document.getElementById('tetrisBtn');
             if (isTetrisMode) {
-                btn.className = "bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105";
-                btn.innerHTML = '<i class="fa-solid fa-cube text-base"></i> テトリスモードをOFFにする';
-                alert('【テトリスモードON】\nカレンダーの「◎」や「×」をタップして、手動で予約枠をブロック・開放できるようになりました。');
+                btn.className = "bg-gray-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
+                btn.innerHTML = '<i class="fa-solid fa-xmark text-base"></i> モードを終了する';
+                alert('【テトリスモードON：SNS集客チャンス！】\n\n① カレンダーをタップして手動で「◎（空き）」を作ります。\n② そのカレンダー画面をスマホでスクショ（撮影）します。\n③ Instagramのストーリーズ等で「急遽空きが出ました！早い者勝ち！」と投稿して空き枠を埋めましょう！');
             } else {
-                btn.className = "bg-gray-300 text-gray-600 font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105";
-                btn.innerHTML = '<i class="fa-solid fa-cube text-base"></i> テトリスモードをONにする';
+                btn.className = "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
+                btn.innerHTML = '<i class="fa-solid fa-camera-retro text-base"></i> テトリスモード（SNS集客用）';
             }
         };
 
@@ -500,7 +502,7 @@
         window.unselectSlot = async (dateStr, timeStr) => {
             if (isAdmin) {
                 if (!isTetrisMode) {
-                    alert('枠を手動で開放するには、右上の「テトリスモード」をONにしてください。');
+                    alert('枠を手動で開放してインスタに上げるには、右上の「テトリスモード」をONにしてください。');
                     return;
                 }
                 try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ok' }); } catch (e) {}
@@ -517,7 +519,6 @@
             const name = document.getElementById('custName').value;
             const tel = document.getElementById('custTel').value;
             const email = document.getElementById('custEmail').value;
-            // 追加：きっかけ取得
             const source = document.getElementById('custSource').value;
             
             const btn = document.getElementById('finalSubmitBtn');
@@ -563,7 +564,6 @@
             }
         };
 
-        // ★ メニュー別割合グラフの描画
         const updateChart = () => {
             if (!document.getElementById('menuChart')) return;
             const ctx = document.getElementById('menuChart').getContext('2d');
@@ -571,7 +571,7 @@
             const counts = {};
             bookingsList.forEach(b => {
                 if(b.status === 'キャンセル' || b.status === '否認') return;
-                const mainMenu = b.menu.split(' ＋ ')[0]; // 複合メニューは最初のものをメインとする
+                const mainMenu = b.menu.split(' ＋ ')[0]; 
                 counts[mainMenu] = (counts[mainMenu] || 0) + 1;
             });
 
@@ -597,7 +597,6 @@
             });
         };
 
-        // ★ リッチな顧客カルテ（画像通り）にアップデート！
         const renderAdminBookings = () => {
             const listContainer = document.getElementById('adminBookingList');
             if(!listContainer) return;
@@ -607,14 +606,12 @@
                 return;
             }
             
-            // 新しい予約が上に来るようにソート
             const sortedList = [...bookingsList].sort((a,b) => new Date(b.createdAt?.toDate() || 0) - new Date(a.createdAt?.toDate() || 0));
 
             sortedList.forEach(b => {
                 const tTime = b.totalTime || 30;
                 
-                // ステータスバッジの出し分け
-                let statusColor = 'bg-[#fef9c3] text-yellow-800'; // 未承認（黄）
+                let statusColor = 'bg-[#fef9c3] text-yellow-800'; 
                 if (b.status === '承認済') statusColor = 'bg-green-100 text-green-800';
                 if (b.status === '否認' || b.status === 'キャンセル') statusColor = 'bg-gray-200 text-gray-600';
 
@@ -662,7 +659,6 @@
             });
         };
 
-        // カルテ機能（自動保存・承認・否認・メール）
         window.saveMemo = async (id, text) => {
             try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { memo: text }); } catch(e) {}
         };
@@ -715,7 +711,6 @@
                 document.getElementById('emergencyBtn').classList.remove('hidden');
                 document.getElementById('backToMenuBtn').classList.add('hidden');
 
-                // グラフの初回描画
                 setTimeout(() => updateChart(), 100);
 
                 window.changeStep(2);
