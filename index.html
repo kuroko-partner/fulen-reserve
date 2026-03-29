@@ -30,15 +30,62 @@
         .fade-in-up { animation: fadeInUp 1s ease-out forwards; opacity: 0; transform: translateY(20px); }
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
-        .calendar-outer-wrapper { overflow-x: auto; background: white; border: 1px solid #eee; border-radius: 12px; position: relative; -webkit-overflow-scrolling: touch; }
+        /* ★カレンダーの操作性改善（スクロール枠と固定軸） */
+        .calendar-outer-wrapper { 
+            overflow: auto; /* 縦横両方スクロール可能に */
+            max-height: 65vh; /* 画面の約65%の高さでストップ（専用枠） */
+            background: white; 
+            border: 1px solid #e5e7eb; 
+            border-radius: 12px; 
+            position: relative; 
+            -webkit-overflow-scrolling: touch;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+        }
         .hpb-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
-        .hpb-table th, .hpb-table td { border: 0.5px solid #f0f0f0; text-align: center; height: 60px; padding: 0; position: relative; min-width: 80px; }
-        .time-col { background-color: #f9f9f9 !important; width: 60px !important; min-width: 60px !important; font-weight: bold; font-size: 11px; color: #666;}
-        .sticky-left { position: sticky; left: 0; z-index: 40; border-right: 2px solid #eee !important; }
+        
+        /* セルの基本設定（背景を白にして文字が透けないようにする） */
+        .hpb-table th, .hpb-table td { 
+            border: 1px solid #f3f4f6; 
+            text-align: center; 
+            height: 60px; 
+            padding: 0; 
+            min-width: 80px; 
+            background-color: #ffffff;
+        }
+        
+        /* ① 日付軸（一番上）を固定 */
+        .hpb-table thead th {
+            position: sticky;
+            top: 0;
+            background-color: #f8fafc !important; /* 透けないように色付け */
+            z-index: 45; /* かなり手前に出す */
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* 下に影をつけて浮き立たせる */
+        }
+
+        /* ② 時間軸（一番左）を固定 */
+        .time-col { 
+            background-color: #f8fafc !important; 
+            width: 60px !important; 
+            min-width: 60px !important; 
+            font-weight: bold; 
+            font-size: 11px; 
+            color: #64748b;
+        }
+        .sticky-left { 
+            position: sticky; 
+            left: 0; 
+            z-index: 40; /* 日付軸よりは奥に */
+            border-right: 2px solid #e2e8f0 !important; 
+        }
+
+        /* ③ 左上の角「TIME」を最強に固定（上にも左にも） */
+        .hpb-table thead th.sticky-left {
+            z-index: 50; /* 一番手前に出す */
+        }
         
         .status-ok { color: var(--color-accent); cursor: pointer; background: #fff; font-size: 24px; font-weight: bold; }
-        .status-ng { color: #ddd; background-color: #fafafa; cursor: not-allowed; font-size: 20px; font-weight: bold; }
-        .status-closed { background-color: #f1f1f1; color: #999; font-size: 11px; font-weight: bold; }
+        .status-ng { color: #d1d5db; background-color: #f9fafb; cursor: not-allowed; font-size: 20px; font-weight: bold; }
+        .status-closed { background-color: #f1f5f9; color: #94a3b8; font-size: 11px; font-weight: bold; }
 
         .admin-panel { background: #1a1a1a; color: white; position: relative; z-index: 3000; border-bottom: 2px solid var(--color-primary); }
         .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
@@ -143,7 +190,7 @@
             </div>
             <div class="calendar-outer-wrapper shadow-lg">
                 <table class="hpb-table" id="calendarTable">
-                    <thead><tr id="dateHeader" class="bg-gray-50 text-[#1e3a8a]"></tr></thead>
+                    <thead><tr id="dateHeader"></tr></thead>
                     <tbody id="calendarBody"></tbody>
                 </table>
             </div>
@@ -250,7 +297,6 @@
         let selectedDate = ""; 
         let selectedTime = ""; 
 
-        // ★メニューを最新のHPに完全にシンクロ
         const menuData = [
             { name: "カット(シャンプーなし)", time: 60, price: 3850, desc: "スタンダード", isCut: true },
             { name: "小学生以下(キッズカット)", time: 30, price: 2200, desc: "シャンプーなし", isCut: true },
@@ -348,7 +394,6 @@
             document.querySelectorAll('.step-content').forEach(c=>c.classList.remove('active')); 
             document.getElementById(`step${s}`).classList.add('active'); 
             
-            // ステップヘッダーの色の切り替え
             for(let i=1; i<=4; i++) {
                 const header = document.getElementById(`stepHeader${i}`);
                 if(i === s) {
@@ -365,7 +410,8 @@
         const renderCalendar = () => {
             const body = document.getElementById('calendarBody'), head = document.getElementById('dateHeader');
             if(!body || !head) return;
-            body.innerHTML = ''; head.innerHTML = '<th class="time-col sticky-left border-b border-gray-200">TIME</th>';
+            // 左上角のTIMEを完全固定
+            body.innerHTML = ''; head.innerHTML = '<th class="time-col sticky-left">TIME</th>';
             
             const dates = [];
             const today = new Date();
@@ -378,13 +424,13 @@
             }
 
             dates.forEach(d => {
-                if (d.getDay() === 5) { head.innerHTML += `<th class="time-col border-l-2 border-r-2 border-gray-200 border-b">TIME</th>`; }
+                if (d.getDay() === 5) { head.innerHTML += `<th class="time-col">TIME</th>`; }
                 const label = `${d.getMonth()+1}/${d.getDate()}`;
                 const dayStr = ['日','月','火','水','木','金','土'][d.getDay()];
                 let colorClass = 'text-[#1e3a8a]';
                 if(d.getDay() === 0) colorClass = 'text-red-500'; 
                 if(d.getDay() === 6) colorClass = 'text-blue-500'; 
-                head.innerHTML += `<th class="py-3 min-w-[80px] ${colorClass} border-b border-gray-200"><div class="text-sm font-bold">${label}</div><div class="text-[10px]">(${dayStr})</div></th>`;
+                head.innerHTML += `<th class="py-3 min-w-[80px] ${colorClass}"><div class="text-sm font-bold">${label}</div><div class="text-[10px]">(${dayStr})</div></th>`;
             });
 
             timeSlots.forEach(t => {
@@ -392,14 +438,13 @@
                 let rowHtml = `<td class="time-col sticky-left">${t}</td>`;
                 
                 dates.forEach(d => {
-                    if (d.getDay() === 5) { rowHtml += `<td class="time-col border-l-2 border-r-2 border-gray-200">${t}</td>`; }
+                    if (d.getDay() === 5) { rowHtml += `<td class="time-col">${t}</td>`; }
                     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                     const slotId = `${dateStr}_${t}`;
                     const status = reservationData[slotId] || 'ok';
                     
                     const isMonday = (d.getDay() === 1); 
                     const isSecondTuesday = (d.getDay() === 2 && d.getDate() >= 8 && d.getDate() <= 14);
-                    // ★第3日曜日も休みに変更
                     const isThirdSunday = (d.getDay() === 0 && d.getDate() >= 15 && d.getDate() <= 21);
                     const isHoliday = isMonday || isSecondTuesday || isThirdSunday;
                     const isPublicHoliday = autoHolidays.includes(dateStr);
