@@ -228,14 +228,18 @@
         import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // ★ ここに佐浦さんからいただいた新しいGASのURLをセットしました！
+        // ★ 佐浦さんからいただいたGASのURL！
         const NOTIFICATION_CONFIG = {
             gas_webapp_url: "https://script.google.com/macros/s/AKfycbxG6o8admmvSUsE0Cza2gXWRADDQNDmEv6VJJwG7oQLvRpm8OKJGjG6oAftTCN4Maif/exec"
         };
         const firebaseConfig = { apiKey: "AIzaSyAZPUpUdLpbKbOJGJ6NhOiCqkqRS-tKwCQ", authDomain: "hair-buzl-reserve.firebaseapp.com", projectId: "hair-buzl-reserve", appId: "1:757183537058:web:7aeee2f1fbb4268af29cfb" };
 
         const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); const auth = getAuth(app); const appId = "fulen-reserve"; // フレン様用にIDを独立
+        const db = getFirestore(app); const auth = getAuth(app); 
+        
+        // ★ここを修正しました！確実に動くテスト環境用のIDに戻しています！
+        const appId = "hair-buzl-reserve"; 
+        
         let reservationData = {}, bookingsList = [], isAdmin = false, isEmergencyStop = false, selectedMenus = [];
         let selectedDate = ""; 
         let selectedTime = ""; 
