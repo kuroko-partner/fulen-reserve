@@ -153,8 +153,8 @@
                         <span class="text-[#3eb4c8] font-black mr-1 text-2xl">|</span> BOOKINGS<br>MANAGEMENT
                     </div>
                     <div class="text-right">
-                        <button id="tetrisModeBtn" onclick="window.toggleTetrisMode()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-2 px-3 rounded-lg shadow-md hover:scale-105 transition-transform flex items-center gap-1">
-                            <i class="fab fa-instagram text-sm"></i> SNS集客モードをON
+                        <button id="tetrisModeBtn" onclick="window.toggleTetrisMode()" class="bg-white border border-[#3eb4c8] text-[#3eb4c8] font-bold py-2 px-4 rounded-full shadow-sm text-xs hover:bg-[#f4eee1] transition-colors flex items-center gap-1">
+                            <i class="fab fa-instagram text-sm"></i> SNSモード
                         </button>
                     </div>
                 </div>
@@ -170,7 +170,7 @@
                 <div class="bg-white p-6 rounded-3xl w-80 max-w-[90%] text-center shadow-2xl relative">
                     <h3 class="font-black text-purple-600 mb-4 flex justify-center items-center gap-2"><i class="fab fa-instagram"></i> インスタ募集テキスト</h3>
                     <textarea id="tetrisText" class="w-full h-48 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs mb-4 outline-none resize-none leading-relaxed" readonly></textarea>
-                    <button onclick="window.copyTetrisText()" class="w-full py-3 bg-blue-500 text-white font-bold rounded-xl mb-2 shadow-md active:scale-95 transition-transform">テキストをコピーする</button>
+                    <button onclick="window.copyTetrisText()" class="w-full py-3 bg-[#3eb4c8] text-white font-bold rounded-xl mb-2 shadow-md active:scale-95 transition-transform">テキストをコピーする</button>
                     <button onclick="document.getElementById('tetrisModal').style.display='none'" class="w-full py-3 bg-gray-100 text-gray-600 font-bold rounded-xl active:scale-95 transition-transform">閉じる</button>
                 </div>
             </div>
@@ -190,13 +190,13 @@
                 
                 <div class="mt-4 relative">
                     <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none text-gray-400 font-bold" onchange="this.classList.remove('text-gray-400'); this.classList.add('text-gray-800');">
-    <option value="" disabled selected>当店を何で知りましたか？（必須）</option>
-    <option value="Instagram" class="text-gray-800 font-normal">Instagramを見て</option>
-    <option value="Googleマップ" class="text-gray-800 font-normal">Googleマップ（検索）を見て</option>
-    <option value="知人からの紹介" class="text-gray-800 font-normal">知人からの紹介</option>
-    <option value="お店の前を通って" class="text-gray-800 font-normal">お店の前を通って</option>
-    <option value="その他" class="text-gray-800 font-normal">その他</option>
-</select>
+                        <option value="" disabled selected>当店を何で知りましたか？（必須）</option>
+                        <option value="Instagram" class="text-gray-800 font-normal">Instagramを見て</option>
+                        <option value="Googleマップ" class="text-gray-800 font-normal">Googleマップ（検索）を見て</option>
+                        <option value="知人からの紹介" class="text-gray-800 font-normal">知人からの紹介</option>
+                        <option value="お店の前を通って" class="text-gray-800 font-normal">お店の前を通って</option>
+                        <option value="その他" class="text-gray-800 font-normal">その他</option>
+                    </select>
                     <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
                         <i class="fas fa-chevron-down"></i>
                     </div>
@@ -270,11 +270,10 @@
         import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // ★ FULEN様の各種APIキー・設定
         const NOTIFICATION_CONFIG = {
             emailjs_public_key: "lc5Jwq9AAUj2Z175h", 
             emailjs_service_id: "service_lbq9cl8", 
-            emailjs_template_id: "template_top1q8z", // ※サンキューメール用テンプレートを後で作成し、ここのIDを書き換えてください
+            emailjs_template_id: "template_top1q8z", 
             gas_webapp_url: "https://script.google.com/macros/s/AKfycbxG6o8admmvSUsE0Cza2gXWRADDQNDmEv6VJJwG7oQLvRpm8OKJGjG6oAftTCN4Maif/exec"
         };
         const firebaseConfig = { apiKey: "AIzaSyAZPUpUdLpbKbOJGJ6NhOiCqkqRS-tKwCQ", authDomain: "hair-buzl-reserve.firebaseapp.com", projectId: "hair-buzl-reserve", appId: "1:757183537058:web:7aeee2f1fbb4268af29cfb" };
@@ -288,7 +287,6 @@
         let isTetrisMode = false;
         let myChart = null;
 
-        // ★ FULEN様 メニューデータ（トリートメント単体時のロジック搭載）
         const menuData = [
             { name: "カット（シャンプーなし）", time: 60, price: 3850, desc: "スタンダード", isCut: true, isMain: true },
             { name: "カラーカット", time: 120, price: 8800, desc: "※全体カラーの場合、当日＋550円", includesCut: true, isMain: true },
@@ -341,7 +339,7 @@
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), snap => { bookingsList = snap.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBookings(); updateChart(); });
         };
 
-        // ★ 【修正版】メニュー選択時のロジック（アラートを廃止し、自動切り替えに変更）
+        // ★ 自動切り替え対応済みのメニュー生成ロジック
         const initMenu = () => {
             const list = document.getElementById('menuList');
             list.innerHTML = "";
@@ -359,30 +357,21 @@
                     <p class="text-[#1e3a8a] font-black mt-2">¥${m.price.toLocaleString()}${m.isStartingPrice ? '〜' : ''} <span class="text-[10px] text-gray-400 font-normal">（税込）</span></p>
                     ${isSelected ? '<div class="absolute top-2 right-2 text-[#3eb4c8] font-black"><i class="fa-solid fa-circle-check"></i></div>' : ''}
                 `;
-
-                // ▼▼▼ ここから下が「思いやり自動切り替え」ロジック ▼▼▼
+                
                 card.onclick = () => { 
                     if (isSelected) {
-                        // 既に選択されているものをタップしたら、シンプルに解除
                         selectedMenus = selectedMenus.filter(sm => sm.name !== m.name);
                     } else {
-                        // ★ 新しくメニューを選んだ時の「空気読み（自動解除）」処理
                         if (m.isCut) {
-                            // 「カット単体」を選んだら、すでにある「カット込み」や「他のカット単体」をそっと外す
                             selectedMenus = selectedMenus.filter(sm => !sm.includesCut && !sm.isCut);
                         } else if (m.includesCut) {
-                            // 「カット込み」を選んだら、すでにある「カット単体」をそっと外す
                             selectedMenus = selectedMenus.filter(sm => !sm.isCut);
                         }
-                        
-                        // 邪魔なものを省いた上で、今回選んだメニューを追加
                         selectedMenus.push(m);
                     }
                     initMenu();
                     window.updateStep1Footer(); 
                 };
-                // ▲▲▲ ここまで ▼▲▲
-
                 list.appendChild(card);
             });
         };
@@ -436,7 +425,6 @@
             }
         };
 
-        // ★ カレンダー描画（連続枠チェック機能搭載）
         const renderCalendar = () => {
             const body = document.getElementById('calendarBody'), head = document.getElementById('dateHeader');
             if(!body || !head) return;
@@ -486,7 +474,6 @@
                     } else if (!isAdmin) { 
                         for (let i = 0; i < requiredSlots; i++) {
                             const checkIndex = tIndex + i;
-                            
                             if (checkIndex >= timeSlots.length) { canBook = false; break; }
                             
                             const checkTime = timeSlots[checkIndex];
@@ -534,6 +521,7 @@
             btn.disabled = !isChecked; 
         };
 
+        // ★ 通信環境エラー回避（no-cors）対応済みの送信ロジック
         window.submitBooking = async () => {
             const name = document.getElementById('custName').value;
             const tel = document.getElementById('custTel').value;
@@ -568,18 +556,16 @@
                     }
                 }
 
-                // 【修正後】fetchの部分に通信ブロックを回避するおまじない（mode: 'no-cors' など）を追加しました
-await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
-    method: 'POST',
-    mode: 'no-cors', // ★ブラウザのセキュリティブロックを回避
-    headers: {
-        'Content-Type': 'text/plain' // ★GASに弾かれないための設定
-    },
-    body: JSON.stringify({ type: 'new_booking', name: name, tel: tel, source: source, date: selectedDate, time: selectedTime, menu: combinedMenuNames, totalTime: totalTime })
-}).catch(e => console.log('通知エラー回避', e)); // ★万が一通知に失敗しても、お客様は完了画面に進めるようにする
+                // ★ CORSエラーをすり抜けるおまじない
+                await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain' },
+                    body: JSON.stringify({ type: 'new_booking', name: name, tel: tel, source: source, date: selectedDate, time: selectedTime, menu: combinedMenuNames, totalTime: totalTime })
+                }).catch(e => console.log('通知の裏側処理', e));
 
-window.changeStep(4);
-document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
+                window.changeStep(4);
+                document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
 
             } catch (error) {
                 console.error(error);
@@ -716,7 +702,6 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
             }
         };
 
-        // ★ FULEN様用 サンキューメール送信ロジック（URL反映済み！）
         window.sendThankYou = async (id, name, email) => {
             const msg = `${name}様、先日はHAIRSALON FULENにご来店いただき、誠にありがとうございました！\n\nその後、髪の調子はいかがでしょうか？\nもしセットで分からないことや、気になることがあれば、いつでも公式LINEからご相談くださいね。\n\n【大切なお願いです🙇‍♂️】\nもし先日の仕上がりにご満足いただけておりましたら、お手数ですが下記のリンクからご感想（Google口コミ）をいただけないでしょうか？\n星のタップや、たった一言「よかった！」だけでも大変嬉しいです！\n\n👇こちらから1分で投稿できます\nhttps://g.page/r/CRJELxnv2KoSEBM/review\n\nまたお会いできる日を、心よりお待ちしております！`;
 
@@ -725,7 +710,7 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
                     if (email) {
                         await emailjs.send(
                             NOTIFICATION_CONFIG.emailjs_service_id,
-                            "template_znaqqfl", // ※EmailJSで作成したサンキュー用テンプレートIDを入れてください
+                            "template_znaqqfl", 
                             { email: email, message: msg, name: name },
                             NOTIFICATION_CONFIG.emailjs_public_key
                         );
@@ -751,6 +736,7 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
             } 
         };
         
+        // ★ 管理者モードログイン時に、カレンダーを再描画して「×」を付けられるように修正
         window.verifyAdmin = async () => {
             const passInput = document.getElementById('adminPass').value;
             const btn = event.target; const originalText = btn.innerText;
@@ -766,6 +752,7 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
                     document.getElementById('adminBookingSection').classList.remove('hidden'); 
                     document.getElementById('emergencyBtn').classList.remove('hidden'); 
                     document.getElementById('emergencyOverlay').style.display = 'none'; 
+                    renderCalendar(); // ★ ここを追加！（管理者権限でカレンダーを描き直す）
                     window.changeStep(2);
                 } else { alert("パスワードが違います"); } 
             } catch (e) { alert("通信エラーが発生しました。"); } 
@@ -777,19 +764,17 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
             try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), { active: newState }); } catch(e) {}
         };
 
-        // ★ FULEN様用 テトリス（SNS集客）モード
+        // ★ 可愛くしたボタンに合わせて挙動を修正
         window.toggleTetrisMode = () => {
             isTetrisMode = !isTetrisMode;
             const btn = document.getElementById('tetrisModeBtn');
             if (isTetrisMode) {
-                btn.innerHTML = '<i class="fab fa-instagram text-sm"></i> SNSモード中 (枠をタップ)';
-                btn.classList.replace('from-purple-500', 'from-yellow-400');
-                btn.classList.replace('to-pink-500', 'to-orange-500');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> 枠をタップ！';
+                btn.className = "bg-pink-500 text-white font-bold py-2 px-4 rounded-full shadow-md text-xs hover:bg-pink-600 transition-colors flex items-center gap-1";
                 alert("カレンダーから、インスタで募集したい「空きの時間枠（◎）」をタップしてください！");
             } else {
-                btn.innerHTML = '<i class="fab fa-instagram text-sm"></i> SNS集客モードをON';
-                btn.classList.replace('from-yellow-400', 'from-purple-500');
-                btn.classList.replace('to-orange-500', 'to-pink-500');
+                btn.innerHTML = '<i class="fab fa-instagram"></i> SNSモード';
+                btn.className = "bg-white border border-[#3eb4c8] text-[#3eb4c8] font-bold py-2 px-4 rounded-full shadow-sm text-xs hover:bg-[#f4eee1] transition-colors flex items-center gap-1";
             }
         };
 
@@ -810,7 +795,6 @@ document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
             }).catch(() => { alert('コピーに失敗しました。お手数ですが手動でコピーしてください。'); });
         };
         
-        // ★ SNS集客モード時のカレンダータップ制御
         window.selectSlot = async (dateStr, timeStr) => {
             if (isAdmin) {
                 if (isTetrisMode) { window.openTetrisModal(dateStr, timeStr); } 
