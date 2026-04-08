@@ -135,7 +135,7 @@
             <div id="customerLegend" class="mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-left">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Availability Guide</p>
                 <div class="grid grid-cols-2 gap-2 text-[10px]">
-                    <div class="flex items-center gap-2 p-2 bg-[#f4eee1] rounded-lg"><span class="text-[#3eb4c8] text-xl font-black">◎</span>余裕あり</div>
+                    <div class="flex items-center gap-2 p-2 bg-[#f4eee1] rounded-lg"><span class="text-[#3eb4c8] text-xl font-black">◎</span>予約可能</div>
                     <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"><span class="text-gray-300 text-xl font-black">×</span>予約不可</div>
                  </div>
             </div>
@@ -426,7 +426,7 @@
             }
         };
 
-        // ★ カレンダー描画（バズール様の連続枠チェック機能を搭載！）
+        // ★ カレンダー描画（連続枠チェック機能搭載）
         const renderCalendar = () => {
             const body = document.getElementById('calendarBody'), head = document.getElementById('dateHeader');
             if(!body || !head) return;
@@ -474,7 +474,6 @@
                     if (status !== 'ok') {
                         canBook = false; 
                     } else if (!isAdmin) { 
-                        // ★ 連続枠チェックロジック
                         for (let i = 0; i < requiredSlots; i++) {
                             const checkIndex = tIndex + i;
                             
@@ -483,7 +482,6 @@
                             const checkTime = timeSlots[checkIndex];
                             const timeNum = parseInt(checkTime.replace(':', ''), 10);
                             
-                            // 営業時間外の枠に被っていないかチェック
                             if (d.getDay() === 4 && !isPublicHoliday) {
                                 if (timeNum >= 2200) { canBook = false; break; }
                             } else if (d.getDay() === 0 || isPublicHoliday) {
@@ -492,7 +490,6 @@
                                 if (timeNum >= 1900) { canBook = false; break; }
                             }
                             
-                            // 他の予約が入っていないかチェック
                             const checkSlotId = `${dateStr}_${checkTime}`;
                             if (reservationData[checkSlotId] === 'ng') {
                                 canBook = false; break;
@@ -500,7 +497,6 @@
                         }
                     }
 
-                    // 自身がそもそも営業時間外かどうかのチェック
                     const thisTimeNum = parseInt(t.replace(':', ''), 10);
                     let isOutOfHours = false;
                     if (d.getDay() === 4 && !isPublicHoliday) { if (thisTimeNum >= 2200) isOutOfHours = true; } 
@@ -704,9 +700,9 @@
             }
         };
 
-        // ★ FULEN様用 サンキューメール送信ロジック
+        // ★ FULEN様用 サンキューメール送信ロジック（URL反映済み！）
         window.sendThankYou = async (id, name, email) => {
-            const msg = `${name}様、先日はHAIRSALON FULENにご来店いただき、誠にありがとうございました！\n\nその後、髪の調子はいかがでしょうか？\nもしセットで分からないことや、気になることがあれば、いつでも公式LINEからご相談くださいね。\n\n【大切なお願いです🙇‍♂️】\nもし先日の仕上がりにご満足いただけておりましたら、お手数ですが下記のリンクからご感想（Google口コミ）をいただけないでしょうか？\n星のタップや、たった一言「よかった！」だけでも大変嬉しいです！\n\n👇こちらから1分で投稿できます\nhttps://g.page/r/（※ここにFULEN様のGoogle口コミURLを入れてください）/review\n\nまたお会いできる日を、心よりお待ちしております！`;
+            const msg = `${name}様、先日はHAIRSALON FULENにご来店いただき、誠にありがとうございました！\n\nその後、髪の調子はいかがでしょうか？\nもしセットで分からないことや、気になることがあれば、いつでも公式LINEからご相談くださいね。\n\n【大切なお願いです🙇‍♂️】\nもし先日の仕上がりにご満足いただけておりましたら、お手数ですが下記のリンクからご感想（Google口コミ）をいただけないでしょうか？\n星のタップや、たった一言「よかった！」だけでも大変嬉しいです！\n\n👇こちらから1分で投稿できます\nhttps://g.page/r/CRJELxnv2KoSEBM/review\n\nまたお会いできる日を、心よりお待ちしております！`;
 
             if(confirm(`${name}様へサンキューメール＆口コミ獲得メッセージを送信しますか？`)) {
                 try {
