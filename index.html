@@ -6,6 +6,7 @@
     <title>予約 | HAIRSALON FULEN (フレン)</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -30,15 +31,16 @@
         @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
 
         .calendar-outer-wrapper { 
-            overflow: auto; max-height: 65vh; background: white; border: 1px solid #e5e7eb; border-radius: 12px; position: relative; -webkit-overflow-scrolling: touch; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
+            overflow: auto; height: 60vh; max-height: 600px; background: white; border: 1px solid #e5e7eb; border-radius: 12px; position: relative; -webkit-overflow-scrolling: touch; box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
         }
         .hpb-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
-        .hpb-table th, .hpb-table td { border: 1px solid #f3f4f6; text-align: center; height: 60px; padding: 0; min-width: 80px; background-color: #ffffff; }
-        .hpb-table thead th { position: sticky; top: 0; background-color: #f8fafc !important; z-index: 45; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .hpb-table th, .hpb-table td { border: 1px solid #f3f4f6; text-align: center; height: 60px; padding: 0; position: relative; min-width: 80px; background-clip: padding-box; background-color: #ffffff;}
         .time-col { background-color: #f8fafc !important; width: 60px !important; min-width: 60px !important; font-weight: bold; font-size: 11px; color: #64748b; }
-        .sticky-left { position: sticky; left: 0; z-index: 40; border-right: 2px solid #e2e8f0 !important; }
-        .hpb-table thead th.sticky-left { z-index: 50; }
         
+        .sticky-top { position: sticky !important; top: 0 !important; z-index: 45 !important; background-color: #f8fafc !important; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .sticky-left { position: sticky !important; left: 0 !important; z-index: 40 !important; background-color: #f8fafc !important; box-shadow: 2px 0 4px rgba(0,0,0,0.05); border-right: 2px solid #e2e8f0 !important;}
+        .sticky-corner { position: sticky !important; top: 0 !important; left: 0 !important; z-index: 50 !important; background-color: #f8fafc !important; box-shadow: 2px 2px 4px rgba(0,0,0,0.1); border-right: 2px solid #e2e8f0 !important;}
+
         .status-ok { color: var(--color-accent); cursor: pointer; background: #fff; font-size: 24px; font-weight: bold; }
         .status-ng { color: #d1d5db; background-color: #f9fafb; cursor: not-allowed; font-size: 20px; font-weight: bold; }
         .status-closed { background-color: #f1f5f9; color: #94a3b8; font-size: 11px; font-weight: bold; }
@@ -133,7 +135,7 @@
             <div id="customerLegend" class="mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-left">
                 <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Availability Guide</p>
                 <div class="grid grid-cols-2 gap-2 text-[10px]">
-                    <div class="flex items-center gap-2 p-2 bg-[#f4eee1] rounded-lg"><span class="text-[#3eb4c8] text-xl font-black">◎</span>予約可能</div>
+                    <div class="flex items-center gap-2 p-2 bg-[#f4eee1] rounded-lg"><span class="text-[#3eb4c8] text-xl font-black">◎</span>余裕あり</div>
                     <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"><span class="text-gray-300 text-xl font-black">×</span>予約不可</div>
                  </div>
             </div>
@@ -151,8 +153,8 @@
                         <span class="text-[#3eb4c8] font-black mr-1 text-2xl">|</span> BOOKINGS<br>MANAGEMENT
                     </div>
                     <div class="text-right">
-                        <button id="tetrisBtn" onclick="window.toggleTetrisMode()" class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50">
-                            <i class="fa-solid fa-camera-retro text-base"></i> SNS集客モード
+                        <button id="tetrisModeBtn" onclick="window.toggleTetrisMode()" class="bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-2 px-3 rounded-lg shadow-md hover:scale-105 transition-transform flex items-center gap-1">
+                            <i class="fab fa-instagram text-sm"></i> SNS集客モードをON
                         </button>
                     </div>
                 </div>
@@ -162,6 +164,15 @@
                 </div>
                 <h3 class="font-black text-gray-800 mb-4 text-base md:text-lg flex items-center gap-2"><span class="text-[#3eb4c8] font-black text-xl">|</span> <i class="fa-solid fa-clipboard-user text-gray-500"></i> 顧客カルテ（予約一覧）</h3>
                 <div id="adminBookingList" class="space-y-5 max-h-[800px] overflow-y-auto pr-2 pb-10"></div>
+            </div>
+
+            <div id="tetrisModal" class="modal-overlay">
+                <div class="bg-white p-6 rounded-3xl w-80 max-w-[90%] text-center shadow-2xl relative">
+                    <h3 class="font-black text-purple-600 mb-4 flex justify-center items-center gap-2"><i class="fab fa-instagram"></i> インスタ募集テキスト</h3>
+                    <textarea id="tetrisText" class="w-full h-48 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs mb-4 outline-none resize-none leading-relaxed" readonly></textarea>
+                    <button onclick="window.copyTetrisText()" class="w-full py-3 bg-blue-500 text-white font-bold rounded-xl mb-2 shadow-md active:scale-95 transition-transform">テキストをコピーする</button>
+                    <button onclick="document.getElementById('tetrisModal').style.display='none'" class="w-full py-3 bg-gray-100 text-gray-600 font-bold rounded-xl active:scale-95 transition-transform">閉じる</button>
+                </div>
             </div>
 
             <button onclick="window.changeStep(1)" id="backToMenuBtn" class="mt-6 w-full py-4 border-2 border-gray-200 text-gray-500 font-bold rounded-full text-xs uppercase tracking-widest hover:bg-gray-50 transition">メニュー選択へ戻る</button>
@@ -177,13 +188,20 @@
                 <input type="tel" id="custTel" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="電話番号（ハイフンなし可）" inputmode="tel" autocomplete="tel">
                 <input type="email" id="custEmail" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="メールアドレス（任意）" autocomplete="email">
                 
-                <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none cursor-pointer">
-                    <option value="" disabled selected>当店を知ったきっかけ（任意）</option>
-                    <option value="Instagram">Instagram等のSNS</option>
-                    <option value="Google・マップ検索">Google・マップ検索</option>
-                    <option value="知人・ご家族の紹介">知人・ご家族の紹介</option>
-                    <option value="その他・以前から利用">その他・以前から利用</option>
-                </select>
+                <div class="mt-4 relative">
+                    <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none text-gray-400 font-bold" onchange="this.classList.remove('text-gray-400'); this.classList.add('text-gray-800');">
+                        <option value="" disabled selected>当店を何で知りましたか？（必須）</option>
+                        <option value="Instagram" class="text-gray-800 font-normal">Instagramを見て</option>
+                        <option value="Googleマップ" class="text-gray-800 font-normal">Googleマップ（検索）を見て</option>
+                        <option value="知人からの紹介" class="text-gray-800 font-normal">知人からの紹介</option>
+                        <option value="お店の前を通って" class="text-gray-800 font-normal">お店の前を通って</option>
+                        <option value="ホットペッパー" class="text-gray-800 font-normal">ホットペッパービューティー</option>
+                        <option value="その他" class="text-gray-800 font-normal">その他</option>
+                    </select>
+                    <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-gray-500">
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </div>
             </div>
 
             <div class="mb-6 p-5 bg-white border border-gray-200 rounded-2xl h-48 overflow-y-auto text-left text-xs text-gray-600 leading-relaxed shadow-inner">
@@ -253,8 +271,11 @@
         import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        // ★ 佐浦さんからいただいた、通知を飛ばすGASのURLです！
+        // ★ FULEN様の各種APIキー・設定
         const NOTIFICATION_CONFIG = {
+            emailjs_public_key: "lc5Jwq9AAUj2Z175h", 
+            emailjs_service_id: "service_lbq9cl8", 
+            emailjs_template_id: "template_top1q8z", // ※サンキューメール用テンプレートを後で作成し、ここのIDを書き換えてください
             gas_webapp_url: "https://script.google.com/macros/s/AKfycbxG6o8admmvSUsE0Cza2gXWRADDQNDmEv6VJJwG7oQLvRpm8OKJGjG6oAftTCN4Maif/exec"
         };
         const firebaseConfig = { apiKey: "AIzaSyAZPUpUdLpbKbOJGJ6NhOiCqkqRS-tKwCQ", authDomain: "hair-buzl-reserve.firebaseapp.com", projectId: "hair-buzl-reserve", appId: "1:757183537058:web:7aeee2f1fbb4268af29cfb" };
@@ -268,7 +289,7 @@
         let isTetrisMode = false;
         let myChart = null;
 
-        // ★ メニューデータ（トリートメント単体時のロジック追加版）
+        // ★ FULEN様 メニューデータ（トリートメント単体時のロジック搭載）
         const menuData = [
             { name: "カット（シャンプーなし）", time: 60, price: 3850, desc: "スタンダード", isCut: true, isMain: true },
             { name: "カラーカット", time: 120, price: 8800, desc: "※全体カラーの場合、当日＋550円", includesCut: true, isMain: true },
@@ -278,7 +299,6 @@
             { name: "縮毛矯正", time: 180, price: 14850, desc: "ダメージを抑えたワンランク上の縮毛矯正", isCut: false, isMain: true },
             { name: "髪質改善縮毛矯正", time: 210, price: 17000, desc: "髪質改善特化", isCut: false, isMain: true },
 
-            // ★ isTreatment: true のものは、メインメニュー(isMain: true)が選ばれていない時に自動加算されます
             { name: "トリートメント", time: 30, price: 4180, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+30分)が自動加算されます", isTreatment: true, standaloneExtraTime: 30, standaloneExtraPrice: 800 },
             { name: "スパトリートメント", time: 40, price: 4950, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+50分)が自動加算されます", isTreatment: true, standaloneExtraTime: 50, standaloneExtraPrice: 800 },
             
@@ -288,7 +308,6 @@
             { name: "メニュープラス", time: 25, price: 5000, desc: "追加オプション", isOption: true }
         ];
 
-        // 営業時間の全枠（21:30まで）
         const timeSlots = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30"];
         let autoHolidays = [];
 
@@ -308,6 +327,16 @@
             onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), (doc) => {
                 isEmergencyStop = doc.exists() ? doc.data().active : false;
                 document.getElementById('emergencyOverlay').style.display = (isEmergencyStop && !isAdmin) ? 'flex' : 'none';
+                
+                const btn = document.getElementById('emergencyBtn');
+                btn.innerText = isEmergencyStop ? '🛑 停止中 (解除する)' : '✅ 稼働中 (緊急停止)';
+                if (isEmergencyStop) {
+                    btn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                    btn.classList.add('bg-green-600', 'hover:bg-green-700');
+                } else {
+                    btn.classList.remove('bg-green-600', 'hover:bg-green-700');
+                    btn.classList.add('bg-red-600', 'hover:bg-red-700');
+                }
             });
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'slots'), snap => { snap.forEach(d => reservationData[d.id] = d.data().status); renderCalendar(); });
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), snap => { bookingsList = snap.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBookings(); updateChart(); });
@@ -348,25 +377,17 @@
             });
         };
 
-        // ★ 選択されたメニューから合計金額と時間を計算するロジック
         window.calculateTotals = () => {
             let price = 0; let time = 0; let hasStartPrice = false;
-            let hasMainMenu = selectedMenus.some(m => m.isMain); // カットやカラーなどメインが含まれるか
-            let hasTreatment = selectedMenus.some(m => m.isTreatment); // 単体トリートメントが含まれるか
-            let isTreatmentOnly = hasTreatment && !hasMainMenu; // トリートメント単体の判定
+            let hasMainMenu = selectedMenus.some(m => m.isMain); 
+            let hasTreatment = selectedMenus.some(m => m.isTreatment); 
+            let isTreatmentOnly = hasTreatment && !hasMainMenu; 
 
             selectedMenus.forEach(m => { 
-                price += m.price; 
-                time += m.time; 
+                price += m.price; time += m.time; 
                 if(m.isStartingPrice) hasStartPrice = true; 
-                
-                // トリートメント単体の場合、対象メニューの追加料金と追加時間を合算
-                if(isTreatmentOnly && m.isTreatment) {
-                    price += m.standaloneExtraPrice || 0;
-                    time += m.standaloneExtraTime || 0;
-                }
+                if(isTreatmentOnly && m.isTreatment) { price += m.standaloneExtraPrice || 0; time += m.standaloneExtraTime || 0; }
             });
-
             return { price, time, hasStartPrice, isTreatmentOnly };
         };
 
@@ -381,18 +402,14 @@
                 document.getElementById('totalPriceDisplay').innerHTML = `¥${totals.price.toLocaleString()}${totals.hasStartPrice ? '〜' : ''} <span class="text-xs text-gray-500 font-normal">（税込）</span>`;
                 document.getElementById('totalTimeDisplay').innerText = `${totals.time}分`;
 
-                // トリートメント単体なら警告文を表示
-                if(totals.isTreatmentOnly) {
-                    warnText.classList.remove('hidden');
-                } else {
-                    warnText.classList.add('hidden');
-                }
+                if(totals.isTreatmentOnly) warnText.classList.remove('hidden');
+                else warnText.classList.add('hidden');
             } else {
                 footer.classList.add('hidden');
             }
         };
 
-        window.goToStep2 = () => { window.changeStep(2); };
+        window.goToStep2 = () => { renderCalendar(); window.changeStep(2); document.getElementById('step2').scrollIntoView({behavior: 'smooth'}); };
         window.changeStep = (s) => { 
             document.querySelectorAll('.step-content').forEach(c=>c.classList.remove('active')); 
             document.getElementById(`step${s}`).classList.add('active'); 
@@ -407,71 +424,94 @@
                     header.className = "flex-1 py-3 text-center border-b-2 border-transparent text-gray-300 font-bold text-[10px] transition-all";
                 }
             }
-            window.scrollTo(0, document.getElementById('reservation-section').offsetTop);
         };
 
-        // ★ カレンダー描画ロジック（変則営業時間の制御）
+        // ★ カレンダー描画（バズール様の連続枠チェック機能を搭載！）
         const renderCalendar = () => {
             const body = document.getElementById('calendarBody'), head = document.getElementById('dateHeader');
             if(!body || !head) return;
-            body.innerHTML = ''; head.innerHTML = '<th class="time-col sticky-left">TIME</th>';
+            body.innerHTML = ''; head.innerHTML = '<th class="time-col sticky-corner">TIME</th>';
             
             const dates = [];
             const today = new Date();
-            const endDate = new Date(today.getFullYear(), today.getMonth() + 2, today.getDate()); 
+            const endDate = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 90); 
 
             let currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            while (currentDate <= endDate) {
-                dates.push(new Date(currentDate));
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
+            while (currentDate <= endDate) { dates.push(new Date(currentDate)); currentDate.setDate(currentDate.getDate() + 1); }
 
             dates.forEach(d => {
-                if (d.getDay() === 5) { head.innerHTML += `<th class="time-col">TIME</th>`; }
+                if (d.getDay() === 5) { head.innerHTML += `<th class="time-col sticky-top">TIME</th>`; }
                 const label = `${d.getMonth()+1}/${d.getDate()}`;
                 const dayStr = ['日','月','火','水','木','金','土'][d.getDay()];
-                let colorClass = 'text-[#1e3a8a]';
+                let colorClass = 'text-gray-600';
                 if(d.getDay() === 0) colorClass = 'text-red-500'; 
                 if(d.getDay() === 6) colorClass = 'text-blue-500'; 
-                head.innerHTML += `<th class="py-3 min-w-[80px] ${colorClass}"><div class="text-sm font-bold">${label}</div><div class="text-[10px]">(${dayStr})</div></th>`;
+                if(d.getDay() === 1) colorClass = 'text-red-400'; 
+                head.innerHTML += `<th class="py-3 min-w-[80px] ${colorClass} sticky-top"><div class="text-sm font-bold">${label}</div><div class="text-[10px]">(${dayStr})</div></th>`;
             });
 
-            timeSlots.forEach(t => {
+            const totals = window.calculateTotals();
+            const requiredTime = totals.time;
+            const requiredSlots = requiredTime > 0 ? Math.ceil(requiredTime / 30) : 1; 
+
+            timeSlots.forEach((t, tIndex) => {
                 const tr = document.createElement('tr');
                 let rowHtml = `<td class="time-col sticky-left">${t}</td>`;
                 
                 dates.forEach(d => {
                     if (d.getDay() === 5) { rowHtml += `<td class="time-col">${t}</td>`; }
+
                     const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                     const slotId = `${dateStr}_${t}`;
                     const status = reservationData[slotId] || 'ok';
                     
-                    // 休業日の判定
                     const isMonday = (d.getDay() === 1); 
                     const isSecondTuesday = (d.getDay() === 2 && d.getDate() >= 8 && d.getDate() <= 14);
                     const isHoliday = isMonday || isSecondTuesday;
                     const isPublicHoliday = autoHolidays.includes(dateStr);
 
-                    // 営業時間の判定
-                    const timeNum = parseInt(t.replace(':', ''), 10); 
-                    let isOutOfHours = false;
-
-                    if (d.getDay() === 4 && !isPublicHoliday) {
-                        // 木曜日は22:00まで
-                        if (timeNum >= 2200) isOutOfHours = true;
-                    } else if (d.getDay() === 0 || isPublicHoliday) {
-                        // 日・祝日は17:00まで
-                        if (timeNum >= 1700) isOutOfHours = true;
-                    } else {
-                        // その他は19:00まで
-                        if (timeNum >= 1900) isOutOfHours = true;
+                    let canBook = true;
+                    if (status !== 'ok') {
+                        canBook = false; 
+                    } else if (!isAdmin) { 
+                        // ★ 連続枠チェックロジック
+                        for (let i = 0; i < requiredSlots; i++) {
+                            const checkIndex = tIndex + i;
+                            
+                            if (checkIndex >= timeSlots.length) { canBook = false; break; }
+                            
+                            const checkTime = timeSlots[checkIndex];
+                            const timeNum = parseInt(checkTime.replace(':', ''), 10);
+                            
+                            // 営業時間外の枠に被っていないかチェック
+                            if (d.getDay() === 4 && !isPublicHoliday) {
+                                if (timeNum >= 2200) { canBook = false; break; }
+                            } else if (d.getDay() === 0 || isPublicHoliday) {
+                                if (timeNum >= 1700) { canBook = false; break; }
+                            } else {
+                                if (timeNum >= 1900) { canBook = false; break; }
+                            }
+                            
+                            // 他の予約が入っていないかチェック
+                            const checkSlotId = `${dateStr}_${checkTime}`;
+                            if (reservationData[checkSlotId] === 'ng') {
+                                canBook = false; break;
+                            }
+                        }
                     }
 
+                    // 自身がそもそも営業時間外かどうかのチェック
+                    const thisTimeNum = parseInt(t.replace(':', ''), 10);
+                    let isOutOfHours = false;
+                    if (d.getDay() === 4 && !isPublicHoliday) { if (thisTimeNum >= 2200) isOutOfHours = true; } 
+                    else if (d.getDay() === 0 || isPublicHoliday) { if (thisTimeNum >= 1700) isOutOfHours = true; } 
+                    else { if (thisTimeNum >= 1900) isOutOfHours = true; }
+
                     if (isHoliday) {
-                        rowHtml += `<td class="status-closed">休</td>`;
+                        rowHtml += `<td class="status-closed bg-gray-50 text-gray-300 text-xs">休</td>`;
                     } else if (isOutOfHours) {
-                        rowHtml += `<td class="status-closed text-gray-200 font-normal">ー</td>`;
-                    } else if (status !== 'ok') {
+                        rowHtml += `<td class="status-closed bg-gray-50 text-gray-300 text-xs">ー</td>`;
+                    } else if (!canBook) {
                         rowHtml += `<td class="status-ng" onclick="window.unselectSlot('${dateStr}', '${t}')">×</td>`;
                     } else {
                         rowHtml += `<td class="status-ok hover:bg-[#f4eee1] transition-colors" onclick="window.selectSlot('${dateStr}', '${t}')">◎</td>`;
@@ -480,37 +520,6 @@
                 tr.innerHTML = rowHtml;
                 body.appendChild(tr);
             });
-        };
-
-        window.toggleTetrisMode = () => {
-            isTetrisMode = !isTetrisMode;
-            const btn = document.getElementById('tetrisBtn');
-            if (isTetrisMode) {
-                btn.className = "bg-gray-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
-                btn.innerHTML = '<i class="fa-solid fa-xmark text-base"></i> モード終了';
-                alert('【SNS集客モードON】\nカレンダーをタップして手動で「◎（空き）」を作り、スクショしてインスタに上げましょう！');
-            } else {
-                btn.className = "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
-                btn.innerHTML = '<i class="fa-solid fa-camera-retro text-base"></i> SNS集客モード';
-            }
-        };
-
-        window.selectSlot = async (dateStr, timeStr) => {
-            if (isAdmin) {
-                if (!isTetrisMode) { alert('枠を手動でブロックするには「SNS集客モード」をONにしてください。'); return; }
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ng' }); } catch (e) {}
-            } else {
-                selectedDate = dateStr; selectedTime = timeStr;
-                document.getElementById('selectedDateTimeDisplay').innerText = `${selectedDate} ${selectedTime}〜`;
-                window.changeStep(3);
-            }
-        };
-
-        window.unselectSlot = async (dateStr, timeStr) => {
-            if (isAdmin) {
-                if (!isTetrisMode) { alert('枠を手動で開放するには「SNS集客モード」をONにしてください。'); return; }
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ok' }); } catch (e) {}
-            }
         };
 
         window.toggleSubmitBtn = () => { 
@@ -524,43 +533,44 @@
             const tel = document.getElementById('custTel').value;
             const email = document.getElementById('custEmail').value;
             const source = document.getElementById('custSource').value;
-            
             const btn = document.getElementById('finalSubmitBtn');
+            
             if (!name || !tel) { alert("お名前と電話番号を入力してください。"); return; }
+            if (!source) { alert("当店を知ったきっかけを選択してください。"); return; }
 
             btn.innerText = "送信中..."; btn.disabled = true;
             const combinedMenuNames = selectedMenus.map(m => m.name).join(' ＋ ');
-            
-            // ★ 単体トリートメント加算を含む最新の合計を取得
             const totals = window.calculateTotals();
             const combinedPrice = totals.price;
             const totalTime = totals.time;
 
             try {
+                const slotId = `${selectedDate}_${selectedTime}`;
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), {
                     name: name, tel: tel, email: email, source: source, date: selectedDate, time: selectedTime,
-                    menu: combinedMenuNames, price: combinedPrice, totalTime: totalTime, status: '未承認', createdAt: serverTimestamp()
+                    menu: combinedMenuNames, price: combinedPrice, totalTime: totalTime, status: '未承認', thankYouSent: false, memo: '', createdAt: serverTimestamp()
                 });
-
+                
                 const slotsNeeded = Math.ceil(totalTime / 30); 
                 const startIndex = timeSlots.indexOf(selectedTime);
                 if (startIndex !== -1) {
                     for (let i = 0; i < slotsNeeded; i++) {
                         if (startIndex + i < timeSlots.length) {
-                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${selectedDate}_${timeSlots[startIndex + i]}`), { status: 'ng' });
+                            const sId = `${selectedDate}_${timeSlots[startIndex + i]}`;
+                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', sId), { status: 'ng' });
                         }
                     }
                 }
 
                 await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
                     method: 'POST',
-                    body: JSON.stringify({
-                        type: 'new_booking', name: name, tel: tel, date: selectedDate, time: selectedTime, menu: combinedMenuNames 
-                    })
+                    body: JSON.stringify({ type: 'new_booking', name: name, tel: tel, source: source, date: selectedDate, time: selectedTime, menu: combinedMenuNames, totalTime: totalTime })
                 });
-
                 window.changeStep(4);
+                document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
+
             } catch (error) {
+                console.error(error);
                 alert("エラーが発生しました。通信環境の良いところで再度お試しください。");
                 btn.innerText = "仮予約を送信する"; btn.disabled = false;
             }
@@ -590,121 +600,222 @@
                         borderWidth: 0
                     }]
                 },
-                options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 11} } } } } 
+                options: { responsive: true, maintainAspectRatio: false, cutout: '60%', plugins: { legend: { position: 'bottom', labels: { font: { size: 10 }, padding: 15 } } } }
             });
         };
 
-        const renderAdminBookings = () => {
+        const renderAdminBookings = () => { 
             const listContainer = document.getElementById('adminBookingList');
             if(!listContainer) return;
             listContainer.innerHTML = '';
+            
             if (bookingsList.length === 0) {
                 listContainer.innerHTML = '<div class="text-center text-gray-400 py-10 bg-white rounded-2xl border border-gray-100 shadow-sm">現在、予約データはありません</div>';
                 return;
             }
             
-            const sortedList = [...bookingsList].sort((a,b) => new Date(b.createdAt?.toDate() || 0) - new Date(a.createdAt?.toDate() || 0));
-
-            sortedList.forEach(b => {
-                const tTime = b.totalTime || 30;
+            const safeBookings = bookingsList.filter(b => b && b.date && b.time);
+            safeBookings.sort((a, b) => new Date(b.createdAt?.toDate() || 0) - new Date(a.createdAt?.toDate() || 0)).forEach(b => {
+                const statusStr = b.status || '未承認';
                 let statusColor = 'bg-[#fef9c3] text-yellow-800'; 
-                if (b.status === '承認済') statusColor = 'bg-green-100 text-green-800';
-                if (b.status === '否認' || b.status === 'キャンセル') statusColor = 'bg-gray-200 text-gray-600';
+                if (statusStr === '承認済') statusColor = 'bg-green-100 text-green-700';
+                if (statusStr === '否認' || statusStr === 'キャンセル') statusColor = 'bg-gray-200 text-gray-600';
+                
+                const emailHtml = b.email ? `<p class="text-xs text-gray-500 mt-1"><i class="fas fa-envelope mr-1"></i><a href="mailto:${b.email}" class="text-blue-500 underline">${b.email}</a></p>` : '';
+                const tTime = b.totalTime || 30;
 
-                const sourceHtml = b.source ? `<div class="inline-block px-3 py-1 mb-3 rounded-full border border-pink-200 bg-pink-50 text-pink-500 text-[10px] font-bold"><i class="fa-solid fa-magnifying-glass"></i> きっかけ：${b.source}</div>` : '';
-                const emailHtml = b.email ? `<p class="text-xs text-gray-600 mt-1"><i class="fas fa-envelope mr-2 text-gray-400"></i><a href="mailto:${b.email}" class="text-blue-500 hover:underline">${b.email}</a></p>` : '';
+                const isThankYouSent = b.thankYouSent || false;
+                const thankYouBtnClass = isThankYouSent 
+                    ? "w-full py-3 mt-1 bg-gray-300 text-gray-500 font-bold rounded-xl text-xs shadow-inner cursor-not-allowed" 
+                    : "w-full py-3 mt-1 bg-gradient-to-r from-[#3eb4c8] to-[#1e3a8a] text-white font-bold rounded-xl text-xs shadow-md hover:opacity-90 active:scale-95 transition-transform";
+                const thankYouBtnText = isThankYouSent 
+                    ? '<i class="fas fa-check-circle mr-1"></i>サンキューメール送信済み' 
+                    : '<i class="fas fa-envelope-open-text mr-1"></i>サンキューメール＆口コミ獲得';
+                const thankYouBtnAction = isThankYouSent ? "" : `onclick="window.sendThankYou('${b.id}', '${b.name}', '${b.email || ''}')"`;
+
+                let actionButtonsHtml = '';
+                if (statusStr === '否認' || statusStr === 'キャンセル') {
+                    actionButtonsHtml = `<div class="flex flex-wrap gap-2"><button onclick="window.deleteBooking('${b.id}')" class="w-full py-3 bg-red-500 text-white font-bold rounded-xl text-xs shadow-md hover:bg-red-600 active:scale-95 transition-transform"><i class="fas fa-trash-alt mr-1"></i>このカルテを完全に削除する</button></div>`;
+                } else {
+                    actionButtonsHtml = `
+                        <div class="flex flex-wrap gap-2">
+                            <button onclick="window.approveBooking('${b.id}')" class="flex-1 py-3 bg-green-500 text-white font-bold rounded-xl text-xs shadow-md hover:bg-green-600 active:scale-95 transition-transform"><i class="fas fa-check mr-1"></i>承認する</button>
+                            <button onclick="window.rejectBooking('${b.id}', '${b.date}', '${b.time}', '${tTime}')" class="flex-1 py-3 bg-gray-400 text-white font-bold rounded-xl text-xs shadow-md hover:bg-gray-50 active:scale-95 transition-transform"><i class="fas fa-times mr-1"></i>否認(枠開放)</button>
+                            <button ${thankYouBtnAction} class="${thankYouBtnClass}">${thankYouBtnText}</button>
+                        </div>
+                    `;
+                }
 
                 listContainer.innerHTML += `
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 relative mb-4 transition hover:shadow-md">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="font-bold text-gray-800 text-sm md:text-base flex items-center gap-2">
-                                <i class="far fa-calendar-alt text-red-400 text-lg"></i>
-                                ${b.date} ${b.time} 〜 <span class="text-xs text-gray-500 font-normal">(計 ${tTime}分)</span>
+                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 relative mb-4 transition hover:shadow-md">
+                        <div class="flex justify-between items-center mb-3 border-b border-gray-100 pb-2">
+                            <div class="font-bold text-gray-800 text-sm"><i class="far fa-calendar-alt text-[#3eb4c8] mr-2"></i>${b.date} ${b.time} 〜 <span class="text-xs text-gray-500 font-normal">(計 ${tTime}分)</span></div>
+                            <span class="px-2 py-1 text-[10px] font-black rounded-md ${statusColor}">${statusStr}</span>
+                        </div>
+                        <div class="mb-4">
+                            <p class="font-black text-lg text-gray-800 mb-1">${b.name} 様</p>
+                            <p class="text-xs text-gray-500 mt-1"><i class="fas fa-phone mr-1"></i><a href="tel:${b.tel}" class="text-blue-500 underline">${b.tel}</a></p>
+                            ${emailHtml}
+                            <div class="mt-2 inline-block px-2 py-1 bg-cyan-50 text-[#3eb4c8] text-[10px] font-bold rounded border border-cyan-100"><i class="fas fa-search mr-1"></i>きっかけ：${b.source || '未回答'}</div>
+                            <div class="mt-3 p-2 bg-[#f4eee1] rounded-lg border border-white">
+                                <p class="text-[10px] text-[#3eb4c8] font-bold mb-1">予約メニュー</p>
+                                <p class="text-xs text-gray-700 font-bold leading-relaxed">${b.menu}</p>
                             </div>
-                            <span class="${statusColor} text-[10px] md:text-xs font-black px-3 py-1 md:py-2 rounded-md shadow-sm">${b.status || '未承認'}</span>
                         </div>
-                        <h4 class="font-black text-2xl text-gray-900 mb-3">${b.name} 様</h4>
-                        <p class="text-sm text-gray-600 mt-1"><i class="fas fa-phone mr-2 text-gray-400"></i><a href="tel:${b.tel}" class="text-blue-500 hover:underline font-bold">${b.tel}</a></p>
-                        ${emailHtml}
-                        <div class="mt-4">${sourceHtml}</div>
-                        <div class="mt-2 p-4 bg-[#fff0f5] rounded-xl border border-pink-100">
-                            <p class="text-[10px] text-pink-400 font-bold mb-2">予約メニュー</p>
-                            <p class="text-sm md:text-base text-gray-800 font-black leading-relaxed">${b.menu}</p>
+                        <div class="mb-4">
+                            <label class="text-[10px] font-bold text-gray-400 mb-1 block"><i class="fas fa-pen mr-1"></i>顧客カルテ（自動保存）</label>
+                            <textarea onchange="window.updateMemo('${b.id}', this.value)" class="w-full h-20 p-3 bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-[#3eb4c8] transition-all resize-none" placeholder="前回のメニュー、会話の内容などを自由にメモできます...">${b.memo || ''}</textarea>
                         </div>
-                        <div class="mt-5">
-                            <p class="text-[10px] text-gray-400 font-bold mb-2 flex items-center gap-1"><i class="fa-solid fa-pen"></i> 顧客カルテ（自動保存）</p>
-                            <textarea id="memo_${b.id}" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-pink-300 outline-none transition" rows="3" placeholder="前回のメニュー、フルボ酸の反応、会話の内容などを自由にメモできます..." onblur="window.saveMemo('${b.id}', this.value)">${b.memo || ''}</textarea>
-                        </div>
-                        <div class="grid grid-cols-2 gap-3 mt-5">
-                            <button onclick="window.updateStatus('${b.id}', '承認済')" class="bg-[#10b981] hover:bg-emerald-600 text-white font-bold py-3 md:py-4 rounded-xl text-xs md:text-sm shadow-md transition flex justify-center items-center gap-2"><i class="fa-solid fa-check"></i> 承認する</button>
-                            <button onclick="window.cancelBooking('${b.id}', '${b.date}', '${b.time}', ${tTime})" class="bg-[#9ca3af] hover:bg-gray-500 text-white font-bold py-3 md:py-4 rounded-xl text-xs md:text-sm shadow-md transition flex justify-center items-center gap-2"><i class="fa-solid fa-xmark"></i> 否認(枠開放)</button>
-                        </div>
+                        ${actionButtonsHtml}
                     </div>
                 `;
             });
         };
 
-        window.saveMemo = async (id, text) => { try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { memo: text }); } catch(e) {} };
-        window.updateStatus = async (id, status) => { try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { status: status }); } catch(e) {} };
-        window.cancelBooking = async (id, date, time, totalTime) => {
-            if(!confirm("この予約を否認（キャンセル）し、カレンダーの枠を「予約可能」に戻しますか？")) return;
+        window.updateMemo = async (id, text) => { try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { memo: text }); } catch(e) {} };
+        window.approveBooking = async (id) => {
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { status: '承認済' });
+                alert("✅ 承認しました！\n承認後、お客様へLINE等で『確定しました』と直接ご連絡してあげてください。");
+            } catch(e) { alert("通信エラーが発生しました"); }
+        };
+
+        window.rejectBooking = async (id, date, time, totalTimeStr) => {
+            if(!confirm("本当にこの予約をお断り（キャンセル）し、枠を空き状態に戻しますか？")) return;
             try {
                 await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { status: '否認' });
-                const slotsNeeded = Math.ceil(totalTime / 30);
+                const tTime = parseInt(totalTimeStr) || 30;
+                const slotsToFree = Math.ceil(tTime / 30);
                 const startIndex = timeSlots.indexOf(time);
                 if (startIndex !== -1) {
-                    for (let i = 0; i < slotsNeeded; i++) {
+                    for (let i = 0; i < slotsToFree; i++) {
                         if (startIndex + i < timeSlots.length) {
                             await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${date}_${timeSlots[startIndex + i]}`), { status: 'ok' });
                         }
                     }
                 }
-                alert("枠を開放しました");
+                alert("否認処理が完了し、予約枠を開放しました。\n（このカルテは「削除」ボタンから消去可能です）");
             } catch(e) {}
         };
 
-        window.toggleAdminMode = (chk) => { 
-            if(chk) { 
-                document.getElementById('adminAuthModal').style.display = 'flex'; 
-            } else { 
-                isAdmin = false; 
-                document.getElementById('modeLabel').innerText='OFF'; 
-                document.getElementById('adminBookingSection').classList.add('hidden');
-                document.getElementById('emergencyBtn').classList.add('hidden');
-                document.getElementById('backToMenuBtn').classList.remove('hidden'); 
-                window.changeStep(1); 
-            } 
+        window.deleteBooking = async (id) => {
+            if(confirm("このカルテ（予約データ）を完全に削除しますか？\n※この操作は取り消せません。")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id)); alert("カルテを削除しました。"); } catch(e) {}
+            }
         };
 
-        window.verifyAdmin = () => {
-            if(document.getElementById('adminPass').value === "1234") { 
-                isAdmin=true; 
-                document.getElementById('modeLabel').innerText='ON'; 
-                document.getElementById('adminAuthModal').style.display='none'; 
-                document.getElementById('adminBookingSection').classList.remove('hidden'); 
-                document.getElementById('emergencyBtn').classList.remove('hidden');
-                document.getElementById('backToMenuBtn').classList.add('hidden');
-                setTimeout(() => updateChart(), 100);
-                window.changeStep(2);
-                document.getElementById('adminPass').value = "";
-            } else { 
-                alert("パスワードが違います"); 
+        // ★ FULEN様用 サンキューメール送信ロジック
+        window.sendThankYou = async (id, name, email) => {
+            const msg = `${name}様、先日はHAIRSALON FULENにご来店いただき、誠にありがとうございました！\n\nその後、髪の調子はいかがでしょうか？\nもしセットで分からないことや、気になることがあれば、いつでも公式LINEからご相談くださいね。\n\n【大切なお願いです🙇‍♂️】\nもし先日の仕上がりにご満足いただけておりましたら、お手数ですが下記のリンクからご感想（Google口コミ）をいただけないでしょうか？\n星のタップや、たった一言「よかった！」だけでも大変嬉しいです！\n\n👇こちらから1分で投稿できます\nhttps://g.page/r/（※ここにFULEN様のGoogle口コミURLを入れてください）/review\n\nまたお会いできる日を、心よりお待ちしております！`;
+
+            if(confirm(`${name}様へサンキューメール＆口コミ獲得メッセージを送信しますか？`)) {
+                try {
+                    if (email) {
+                        await emailjs.send(
+                            NOTIFICATION_CONFIG.emailjs_service_id,
+                            "template_znaqqfl", // ※EmailJSで作成したサンキュー用テンプレートIDを入れてください
+                            { email: email, message: msg, name: name },
+                            NOTIFICATION_CONFIG.emailjs_public_key
+                        );
+                    } else {
+                        alert("⚠️ このお客様はメールアドレスの登録がないため、システム上のステータス更新のみ行います。（公式LINE等で直接メッセージをお願いいたします！）");
+                    }
+                    await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { thankYouSent: true });
+                    alert(`✨ サンキューメールの処理が完了しました！`);
+                } catch(e) {
+                    console.error("メール送信エラー", e);
+                    alert("🚨 メール送信に失敗しました。\nEmailJSの設定が正しく完了しているか確認してください。");
+                }
             }
+        };
+
+        window.toggleAdminMode = (chk) => { 
+            if(chk) { document.getElementById('adminAuthModal').style.display = 'flex'; } 
+            else { 
+                isAdmin = false; document.getElementById('modeLabel').innerText='OFF'; 
+                document.getElementById('adminBookingSection').classList.add('hidden'); 
+                document.getElementById('emergencyBtn').classList.add('hidden'); 
+                document.getElementById('emergencyOverlay').style.display = isEmergencyStop ? 'flex' : 'none'; 
+            } 
+        };
+        
+        window.verifyAdmin = async () => {
+            const passInput = document.getElementById('adminPass').value;
+            const btn = event.target; const originalText = btn.innerText;
+            btn.innerText = "確認中..."; btn.disabled = true;
+            try {
+                const response = await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
+                    method: 'POST', body: JSON.stringify({ type: 'verifyAdmin', password: passInput })
+                });
+                const result = await response.json();
+                if(result.success === true){ 
+                    isAdmin=true; document.getElementById('modeLabel').innerText='ON'; 
+                    document.getElementById('adminAuthModal').style.display='none'; 
+                    document.getElementById('adminBookingSection').classList.remove('hidden'); 
+                    document.getElementById('emergencyBtn').classList.remove('hidden'); 
+                    document.getElementById('emergencyOverlay').style.display = 'none'; 
+                    window.changeStep(2);
+                } else { alert("パスワードが違います"); } 
+            } catch (e) { alert("通信エラーが発生しました。"); } 
+            finally { btn.innerText = originalText; btn.disabled = false; document.getElementById('adminPass').value = ""; }
         };
 
         window.toggleEmergencyStop = async () => {
             const newState = !isEmergencyStop;
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), { active: newState });
-                const btn = document.getElementById('emergencyBtn');
-                if(newState) {
-                    btn.className = "bg-gray-600 hover:bg-gray-700 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md active:scale-95 transition-all flex items-center gap-1";
-                    btn.innerHTML = "停止中(再開する)";
-                } else {
-                    btn.className = "bg-red-600 hover:bg-red-700 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md active:scale-95 transition-all flex items-center gap-1";
-                    btn.innerHTML = "稼働中(緊急停止)";
+            try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), { active: newState }); } catch(e) {}
+        };
+
+        // ★ FULEN様用 テトリス（SNS集客）モード
+        window.toggleTetrisMode = () => {
+            isTetrisMode = !isTetrisMode;
+            const btn = document.getElementById('tetrisModeBtn');
+            if (isTetrisMode) {
+                btn.innerHTML = '<i class="fab fa-instagram text-sm"></i> SNSモード中 (枠をタップ)';
+                btn.classList.replace('from-purple-500', 'from-yellow-400');
+                btn.classList.replace('to-pink-500', 'to-orange-500');
+                alert("カレンダーから、インスタで募集したい「空きの時間枠（◎）」をタップしてください！");
+            } else {
+                btn.innerHTML = '<i class="fab fa-instagram text-sm"></i> SNS集客モードをON';
+                btn.classList.replace('from-yellow-400', 'from-purple-500');
+                btn.classList.replace('to-orange-500', 'to-pink-500');
+            }
+        };
+
+        window.openTetrisModal = (dateStr, timeStr) => {
+            const parts = dateStr.split('-');
+            const month = parseInt(parts[1], 10); const day = parseInt(parts[2], 10);
+            const text = `【急募枠のお知らせ📢】\n\n急なキャンセル等により、ぽっかり空き時間ができました！\n\n✨ ${month}/${day} ${timeStr}〜 ご案内可能です✨\n\nご希望の方は、プロフィールのURLから1分でご予約いただけます🏃‍♀️💨\n\n#旭川美容室 #フレン #FULEN #東光`;
+            document.getElementById('tetrisText').value = text;
+            document.getElementById('tetrisModal').style.display = 'flex';
+            window.toggleTetrisMode(); 
+        };
+
+        window.copyTetrisText = () => {
+            const copyText = document.getElementById('tetrisText').value;
+            navigator.clipboard.writeText(copyText).then(() => {
+                alert('インスタ用の文章をコピーしました！そのままInstagramに貼り付けてください。');
+                document.getElementById('tetrisModal').style.display = 'none'; 
+            }).catch(() => { alert('コピーに失敗しました。お手数ですが手動でコピーしてください。'); });
+        };
+        
+        // ★ SNS集客モード時のカレンダータップ制御
+        window.selectSlot = async (dateStr, timeStr) => {
+            if (isAdmin) {
+                if (isTetrisMode) { window.openTetrisModal(dateStr, timeStr); } 
+                else {
+                    try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ng' }); } catch (e) {}
                 }
-            } catch(e) { alert("状態の変更に失敗しました"); }
+            } else {
+                selectedDate = dateStr; selectedTime = timeStr;
+                document.getElementById('selectedDateTimeDisplay').innerText = `${selectedDate} ${selectedTime}〜`;
+                window.changeStep(3); document.getElementById('step3').scrollIntoView({behavior: 'smooth'});
+            }
+        };
+
+        window.unselectSlot = async (dateStr, timeStr) => {
+            if (isAdmin) {
+                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ok' }); } catch (e) {}
+            }
         };
     </script>
 </body>
