@@ -557,12 +557,18 @@
                     }
                 }
 
-                await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
-                    method: 'POST',
-                    body: JSON.stringify({ type: 'new_booking', name: name, tel: tel, source: source, date: selectedDate, time: selectedTime, menu: combinedMenuNames, totalTime: totalTime })
-                });
-                window.changeStep(4);
-                document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
+                // 【修正後】fetchの部分に通信ブロックを回避するおまじない（mode: 'no-cors' など）を追加しました
+await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
+    method: 'POST',
+    mode: 'no-cors', // ★ブラウザのセキュリティブロックを回避
+    headers: {
+        'Content-Type': 'text/plain' // ★GASに弾かれないための設定
+    },
+    body: JSON.stringify({ type: 'new_booking', name: name, tel: tel, source: source, date: selectedDate, time: selectedTime, menu: combinedMenuNames, totalTime: totalTime })
+}).catch(e => console.log('通知エラー回避', e)); // ★万が一通知に失敗しても、お客様は完了画面に進めるようにする
+
+window.changeStep(4);
+document.getElementById('step4').scrollIntoView({behavior: 'smooth'});
 
             } catch (error) {
                 console.error(error);
