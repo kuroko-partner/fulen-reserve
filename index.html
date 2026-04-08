@@ -341,6 +341,7 @@
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), snap => { bookingsList = snap.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBookings(); updateChart(); });
         };
 
+        // ★ 【修正版】メニュー選択時のロジック（アラートを廃止し、自動切り替えに変更）
         const initMenu = () => {
             const list = document.getElementById('menuList');
             list.innerHTML = "";
@@ -358,20 +359,30 @@
                     <p class="text-[#1e3a8a] font-black mt-2">¥${m.price.toLocaleString()}${m.isStartingPrice ? '〜' : ''} <span class="text-[10px] text-gray-400 font-normal">（税込）</span></p>
                     ${isSelected ? '<div class="absolute top-2 right-2 text-[#3eb4c8] font-black"><i class="fa-solid fa-circle-check"></i></div>' : ''}
                 `;
+
+                // ▼▼▼ ここから下が「思いやり自動切り替え」ロジック ▼▼▼
                 card.onclick = () => { 
                     if (isSelected) {
+                        // 既に選択されているものをタップしたら、シンプルに解除
                         selectedMenus = selectedMenus.filter(sm => sm.name !== m.name);
                     } else {
-                        const hasStandaloneCut = selectedMenus.some(sm => sm.isCut);
-                        const hasCutIncluded = selectedMenus.some(sm => sm.includesCut);
-                        if (m.isCut && hasCutIncluded) { alert("すでに「カット込み」のメニューが選択されています。"); return; }
-                        if (m.includesCut && hasStandaloneCut) { alert("カット単体のメニューがすでに選択されています。先にチェックを外してください。"); return; }
-                        if (m.isCut && hasStandaloneCut) { alert("カットメニューは複数選択できません。"); return; }
+                        // ★ 新しくメニューを選んだ時の「空気読み（自動解除）」処理
+                        if (m.isCut) {
+                            // 「カット単体」を選んだら、すでにある「カット込み」や「他のカット単体」をそっと外す
+                            selectedMenus = selectedMenus.filter(sm => !sm.includesCut && !sm.isCut);
+                        } else if (m.includesCut) {
+                            // 「カット込み」を選んだら、すでにある「カット単体」をそっと外す
+                            selectedMenus = selectedMenus.filter(sm => !sm.isCut);
+                        }
+                        
+                        // 邪魔なものを省いた上で、今回選んだメニューを追加
                         selectedMenus.push(m);
                     }
                     initMenu();
                     window.updateStep1Footer(); 
                 };
+                // ▲▲▲ ここまで ▼▲▲
+
                 list.appendChild(card);
             });
         };
