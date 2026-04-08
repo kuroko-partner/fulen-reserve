@@ -1,776 +1,86 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>予約 | HAIRSALON FULEN (フレン)</title>
-    
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Serif+JP:wght@300;400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-    <style>
-        :root { 
-            --color-primary: #1e3a8a; 
-            --color-secondary: #f4eee1; 
-            --color-accent: #3eb4c8; 
-        }
-        body { font-family: 'Noto Sans JP', sans-serif; background-color: #fcfcfc; color: #333; -webkit-tap-highlight-color: transparent; scroll-behavior: smooth;}
-        
-        .brand-btn { background-color: var(--color-accent); color: white !important; border-radius: 9999px; transition: all 0.2s; box-shadow: 0 4px 6px rgba(62, 180, 200, 0.3); }
-        .brand-btn:active { transform: translateY(2px); box-shadow: none; filter: brightness(0.95); }
-        .brand-btn:disabled { background-color: #d1d5db; box-shadow: none; transform: none; cursor: not-allowed; }
-        
-        .hero-section {
-            background-image: linear-gradient(rgba(30, 58, 138, 0.3), rgba(0, 0, 0, 0.5)), url('https://images.unsplash.com/photo-1593005517308-18652d38806f?auto=format&fit=crop&q=80&w=1600');
-            background-size: cover; background-position: center; background-attachment: fixed; min-height: 50vh; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; padding: 2rem;
-        }
-        .fade-in-up { animation: fadeInUp 1s ease-out forwards; opacity: 0; transform: translateY(20px); }
-        @keyframes fadeInUp { to { opacity: 1; transform: translateY(0); } }
-
-        .calendar-outer-wrapper { 
-            overflow: auto; 
-            max-height: 65vh; 
-            background: white; 
-            border: 1px solid #e5e7eb; 
-            border-radius: 12px; 
-            position: relative; 
-            -webkit-overflow-scrolling: touch;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.02);
-        }
-        .hpb-table { width: max-content; min-width: 100%; border-collapse: separate; border-spacing: 0; }
-        
-        .hpb-table th, .hpb-table td { border: 1px solid #f3f4f6; text-align: center; height: 60px; padding: 0; min-width: 80px; background-color: #ffffff; }
-        .hpb-table thead th { position: sticky; top: 0; background-color: #f8fafc !important; z-index: 45; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .time-col { background-color: #f8fafc !important; width: 60px !important; min-width: 60px !important; font-weight: bold; font-size: 11px; color: #64748b; }
-        .sticky-left { position: sticky; left: 0; z-index: 40; border-right: 2px solid #e2e8f0 !important; }
-        .hpb-table thead th.sticky-left { z-index: 50; }
-        
-        .status-ok { color: var(--color-accent); cursor: pointer; background: #fff; font-size: 24px; font-weight: bold; }
-        .status-ng { color: #d1d5db; background-color: #f9fafb; cursor: not-allowed; font-size: 20px; font-weight: bold; }
-        .status-closed { background-color: #f1f5f9; color: #94a3b8; font-size: 11px; font-weight: bold; }
-
-        .admin-panel { background: #1a1a1a; color: white; position: relative; z-index: 3000; border-bottom: 2px solid var(--color-primary); }
-        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(2px); }
-        .step-content { display: none; }
-        .step-content.active { display: block; }
-
-        #emergencyOverlay { display: none; position: fixed; inset: 0; background: #fff; z-index: 1500; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ご予約フォーム | ヘアーサロン フレン</title>
+<style>
+  body { font-family: 'Helvetica Neue', Arial, sans-serif; padding: 20px; background-color: #f4f6f9; color: #333; }
+  .container { max-width: 500px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+  h2 { text-align: center; color: #4a4a4a; margin-bottom: 24px; }
+  label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 14px; }
+  input, select { width: 100%; padding: 12px; margin-bottom: 24px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+  button { width: 100%; padding: 15px; background-color: #5b8a72; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background-color 0.3s; }
+  button:hover { background-color: #4a755f; }
+  button:disabled { background-color: #ccc; cursor: not-allowed; }
+  #message { margin-top: 20px; text-align: center; font-weight: bold; color: #5b8a72; }
+  .error { color: #d9534f !important; }
+</style>
 </head>
 <body>
 
-    <div id="emergencyOverlay">
-        <div class="text-6xl mb-6 text-[#1e3a8a]">⚙️</div>
-        <h2 class="text-2xl font-black text-[#1e3a8a] mb-4">ただいま予約受付を一時停止しております</h2>
-        <p class="text-sm text-gray-500 leading-relaxed mb-8">
-            ご不便をおかけして誠に申し訳ございません。<br>
-            現在、予約システムの調整を行っておりますため、<br>しばらく経ってから再度アクセスをお願いいたします。
-        </p>
-        <p class="text-[10px] text-gray-400 font-bold mb-2 uppercase tracking-widest text-center">営業時間内のお急ぎのご連絡</p>
-        <a href="tel:09052232911" class="text-2xl font-black text-gray-800 block mb-1 text-center">090-5223-2911</a>
-        <p class="text-[10px] text-[#3eb4c8] font-bold text-center mt-2">※営業時間外・定休日は対応できかねますので<br>あらかじめご了承ください。</p>
-        <p class="mt-12 text-[10px] text-gray-300 font-bold uppercase tracking-[0.3em]">HAIRSALON FULEN</p>
-    </div>
-
-    <div id="adminAuthModal" class="modal-overlay">
-        <div class="bg-white p-6 rounded-2xl w-80 max-w-[90%] text-center shadow-2xl">
-            <h3 class="font-black text-[#1e3a8a] mb-4">管理者パスワード</h3>
-            <input type="password" id="adminPass" class="w-full p-3 bg-gray-50 border border-gray-200 rounded-xl mb-4 text-center tracking-widest focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="PASSWORD">
-            <button onclick="window.verifyAdmin()" class="w-full py-3 bg-[#1e3a8a] text-white font-bold rounded-xl mb-2 shadow-md">認証する</button>
-            <button onclick="document.getElementById('adminToggle').click(); document.getElementById('adminAuthModal').style.display='none'" class="w-full py-3 bg-gray-100 text-gray-600 font-bold rounded-xl">キャンセル</button>
-        </div>
-    </div>
-
-    <div class="admin-panel p-2 flex justify-between items-center text-xs">
-        <div class="flex items-center gap-2">
-            <div class="flex items-center gap-1 font-black uppercase tracking-tighter text-[#3eb4c8]">
-                <span class="w-2 h-2 rounded-full bg-[#3eb4c8] shadow-[0_0_8px_#3eb4c8]"></span>
-                ADMIN
-             </div>
-            <button id="emergencyBtn" class="hidden bg-red-600 hover:bg-red-700 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md active:scale-95 transition-all flex items-center gap-1" onclick="window.toggleEmergencyStop()">
-                稼働中(緊急停止)
-            </button>
-        </div>
-        <label class="relative inline-flex items-center cursor-pointer scale-75 transform origin-right">
-            <input type="checkbox" id="adminToggle" class="sr-only peer" onchange="window.toggleAdminMode(this.checked)">
-            <div class="w-11 h-6 bg-gray-700 rounded-full peer peer-checked:after:translate-x-full peer-checked:bg-[#3eb4c8] after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all"></div>
-            <span class="ml-2 font-bold text-white">MODE: <span id="modeLabel">OFF</span></span>
-        </label>
-    </div>
-
-    <section class="hero-section">
-        <p class="fade-in-up text-[10px] font-bold text-[#3eb4c8] tracking-[0.3em] uppercase mb-4">RESERVATION</p>
-        <div class="fade-in-up w-24 h-24 rounded-full shadow-2xl mb-6 flex items-center justify-center bg-[#f4eee1] border-4 border-white">
-            <i class="fa-solid fa-scissors text-3xl text-[#1e3a8a]"></i>
-        </div>
-        <h2 class="fade-in-up text-xl md:text-3xl font-serif-jp text-white mb-6 tracking-widest leading-relaxed">HAIRSALON FULEN</h2>
-        <p class="fade-in-up text-xs md:text-sm text-gray-200 leading-loose max-w-md mx-auto font-medium tracking-wide">
-            24時間オンライン予約受付<br>
-            ご希望のメニューと日時をご選択ください。
-        </p>
-        <button onclick="document.getElementById('reservation-section').scrollIntoView({behavior: 'smooth'})" class="mt-8 fade-in-up bg-[#3eb4c8] text-white font-bold py-3 px-8 rounded-full shadow-xl tracking-widest text-xs uppercase hover:scale-105 transition">予約へ進む <i class="fa-solid fa-chevron-down ml-2"></i></button>
-    </section>
-
-    <div id="reservation-section" class="pt-8"></div>
-
-    <div class="flex border-b border-t border-gray-100 bg-white max-w-4xl mx-auto sticky top-0 z-50 shadow-sm">
-        <div id="stepHeader1" class="flex-1 py-3 text-center border-b-2 border-[#3eb4c8] text-[#3eb4c8] font-black text-[10px]">STEP1 メニュー</div>
-        <div id="stepHeader2" class="flex-1 py-3 text-center text-gray-300 font-bold text-[10px]">STEP2 日時</div>
-        <div id="stepHeader3" class="flex-1 py-3 text-center text-gray-300 font-bold text-[10px]">STEP3 入力</div>
-        <div id="stepHeader4" class="flex-1 py-3 text-center text-gray-300 font-bold text-[10px]">完了</div>
-    </div>
-
-    <main class="max-w-4xl mx-auto p-4 pb-24 text-center md:text-left mt-8">
-        
-        <div id="step1" class="step-content active">
-            <h2 class="text-sm font-bold border-l-4 border-[#3eb4c8] pl-2 text-[#1e3a8a] mb-4 text-left">メニューを選択（複数可）</h2>
-            <div id="menuList" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6"></div>
-            
-            <div id="step1Footer" class="bg-white p-5 rounded-2xl border-2 border-[#3eb4c8] shadow-2xl sticky bottom-4 hidden z-50">
-                <h3 class="text-center font-black text-[#3eb4c8] text-sm tracking-widest mb-3 border-b border-gray-100 pb-2">CONFIRMATION</h3>
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-xs font-bold text-gray-600">【お会計予定】</span>
-                    <span class="text-xl font-black text-[#1e3a8a]" id="totalPriceDisplay">¥0</span>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-xs font-bold text-gray-600">【所要目安】</span>
-                    <span class="text-sm font-bold text-gray-800" id="totalTimeDisplay">0分</span>
-                </div>
-                <p class="text-[10px] text-center text-gray-500 mb-4">お間違いがなければ次に進んでください。</p>
-                <button onclick="window.goToStep2()" class="w-full brand-btn py-4 text-sm font-bold uppercase tracking-widest">日時を選択する</button>
-            </div>
-        </div>
-        
-        <div id="step2" class="step-content">
-            <h2 class="text-sm font-bold border-l-4 border-[#3eb4c8] pl-2 text-[#1e3a8a] mb-4 text-left">ご希望の日時を選択</h2>
-            <div id="customerLegend" class="mb-4 bg-white p-3 rounded-xl border border-gray-100 shadow-sm text-left">
-                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2">Availability Guide</p>
-                <div class="grid grid-cols-2 gap-2 text-[10px]">
-                    <div class="flex items-center gap-2 p-2 bg-[#f4eee1] rounded-lg"><span class="text-[#3eb4c8] text-xl font-black">◎</span>予約可能</div>
-                    <div class="flex items-center gap-2 p-2 bg-gray-50 rounded-lg"><span class="text-gray-300 text-xl font-black">×</span>予約不可</div>
-                 </div>
-            </div>
-            
-            <div class="calendar-outer-wrapper shadow-lg">
-                <table class="hpb-table" id="calendarTable">
-                    <thead><tr id="dateHeader"></tr></thead>
-                    <tbody id="calendarBody"></tbody>
-                </table>
-            </div>
-            
-            <div id="adminBookingSection" class="mt-12 hidden text-left bg-gray-50 p-4 md:p-8 rounded-2xl shadow-inner border border-gray-200">
-                
-                <div class="flex justify-between items-end border-b-[3px] border-[#1e3a8a] pb-3 mb-6">
-                    <div class="font-black text-[#1e3a8a] text-lg md:text-xl leading-tight">
-                        <span class="text-[#3eb4c8] font-black mr-1 text-2xl">|</span> BOOKINGS<br>MANAGEMENT
-                    </div>
-                    <div class="text-right">
-                        <p class="text-[9px] md:text-[10px] text-pink-500 font-bold mb-1 mr-1 tracking-widest"><i class="fa-brands fa-instagram"></i> ぽっかり空いた枠をSNSへ！</p>
-                        <button id="tetrisBtn" onclick="window.toggleTetrisMode()" class="bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50">
-                            <i class="fa-solid fa-camera-retro text-base"></i> テトリスモード（SNS集客用）
-                        </button>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-2xl shadow-lg border border-gray-100 mb-8 max-w-lg mx-auto">
-                    <h4 class="text-center font-bold text-gray-700 mb-4 flex justify-center items-center gap-2"><i class="fa-solid fa-chart-pie text-blue-500 text-lg"></i> メニュー別 予約割合</h4>
-                    <div class="relative h-56 w-full">
-                        <canvas id="menuChart"></canvas>
-                    </div>
-                </div>
-
-                <h3 class="font-black text-gray-800 mb-4 text-base md:text-lg flex items-center gap-2"><span class="text-[#3eb4c8] font-black text-xl">|</span> <i class="fa-solid fa-clipboard-user text-gray-500"></i> 顧客カルテ（予約一覧）</h3>
-                <div id="adminBookingList" class="space-y-5 max-h-[800px] overflow-y-auto pr-2 pb-10"></div>
-            </div>
-
-            <button onclick="window.changeStep(1)" id="backToMenuBtn" class="mt-6 w-full py-4 border-2 border-gray-200 text-gray-500 font-bold rounded-full text-xs uppercase tracking-widest hover:bg-gray-50 transition">メニュー選択へ戻る</button>
-        </div>
-        
-        <div id="step3" class="step-content">
-            <h2 class="text-sm font-bold border-l-4 border-[#3eb4c8] pl-2 mb-4 text-[#1e3a8a] text-left">お客様情報の入力</h2>
-             <div class="bg-[#f4eee1] p-6 rounded-2xl shadow-md mb-6 text-left border border-white">
-                <p class="text-xs text-gray-500 font-bold mb-1 text-center">選択中の日時</p>
-                <p id="selectedDateTimeDisplay" class="text-lg font-black text-[#1e3a8a] mb-6 text-center border-b border-white pb-4"></p>
-
-                <input type="text" id="custName" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="お名前（フルネーム）" autocomplete="name">
-                <input type="tel" id="custTel" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="電話番号（ハイフンなし可）" inputmode="tel" autocomplete="tel">
-                <input type="email" id="custEmail" class="w-full p-4 mb-4 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#3eb4c8] outline-none" placeholder="メールアドレス（任意）" autocomplete="email">
-                
-                <select id="custSource" class="w-full p-4 bg-white border border-gray-200 rounded-xl text-sm text-gray-600 focus:ring-2 focus:ring-[#3eb4c8] outline-none appearance-none cursor-pointer">
-                    <option value="" disabled selected>当店を知ったきっかけ（任意）</option>
-                    <option value="Instagram">Instagram等のSNS</option>
-                    <option value="Google・マップ検索">Google・マップ検索</option>
-                    <option value="知人・ご家族の紹介">知人・ご家族の紹介</option>
-                    <option value="その他・以前から利用">その他・以前から利用</option>
-                </select>
-            </div>
-
-            <div class="mb-6 p-5 bg-white border border-gray-200 rounded-2xl h-48 overflow-y-auto text-left text-xs text-gray-600 leading-relaxed shadow-inner">
-                <h4 class="font-bold text-[#1e3a8a] mb-2 border-b border-gray-100 pb-1"><i class="fa-solid fa-circle-exclamation text-[#3eb4c8]"></i> ご来店に際しての注意事項</h4>
-                <ul class="list-disc pl-4 mb-4 space-y-1">
-                    <li>ご予約のキャンセルや日時変更は、なるべくお早めに<strong>当店の公式LINEまたはお電話</strong>にてご連絡をお願いいたします。</li>
-                    <li>ご予約時間を15分以上過ぎてご来店されない場合、自動的にキャンセル扱いとなる場合がございます。</li>
-                </ul>
-
-                <h4 class="font-bold text-[#1e3a8a] mb-2 border-b border-gray-100 pb-1"><i class="fa-solid fa-credit-card text-[#3eb4c8]"></i> お支払いについて</h4>
-                <ul class="list-disc pl-4 mb-4 space-y-1">
-                    <li>当店では<strong>「現金」</strong>をはじめ、クレジットカード・PayPay等のQR決済がご利用いただけます。</li>
-                </ul>
-
-                <h4 class="font-bold text-[#1e3a8a] mb-2 border-b border-gray-100 pb-1"><i class="fa-solid fa-cut text-[#3eb4c8]"></i> メニューに関する注意事項</h4>
-                <ul class="list-disc pl-4 mb-4 space-y-1">
-                    <li>トリートメント・スパのみをご予約の場合、別途シャンプー代（+800円）が加算されます。</li>
-                    <li>カラーなどのメニューは、髪の長さによって料金が変動する場合がございます。</li>
-                </ul>
-            </div>
-
-            <label class="flex items-center gap-2 mb-6 cursor-pointer justify-center bg-gray-50 p-4 rounded-xl border border-gray-200">
-                <input type="checkbox" id="agreeCheck" onchange="window.toggleSubmitBtn()" class="w-5 h-5 accent-[#3eb4c8]">
-                <span class="text-xs text-gray-700 font-bold">注意事項・お支払いについて同意します</span>
-            </label>
-
-            <button id="finalSubmitBtn" disabled onclick="window.submitBooking()" class="w-full py-5 brand-btn font-bold text-sm uppercase tracking-widest">仮予約を送信する</button>
-            <button onclick="window.changeStep(2)" class="mt-4 w-full py-4 text-gray-400 font-bold text-xs uppercase tracking-widest underline">日時選択へ戻る</button>
-        </div>
-        
-        <div id="step4" class="step-content text-center py-16">
-            <div class="w-20 h-20 bg-[#3eb4c8] text-white rounded-full flex items-center justify-center text-4xl mx-auto mb-6 shadow-lg">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <h2 class="text-2xl font-black text-[#1e3a8a] mb-2">仮予約を受け付けました</h2>
-            <p class="text-xs text-gray-500 leading-relaxed mb-8">内容を確認次第、確定のご連絡をさせていただきます。<br>ご来店を心よりお待ちしております。</p>
-            <button onclick="location.reload()" class="brand-btn px-10 py-4 font-bold text-xs uppercase tracking-widest">予約トップへ戻る</button>
-        </div>
-
-    </main>
-
-    <footer class="text-center bg-[#1e3a8a] py-16 text-white relative">
-        <div class="absolute inset-0 bg-white opacity-5"></div>
-        <div class="max-w-4xl mx-auto px-6 relative z-10">
-            <h3 class="font-elegant font-bold text-3xl mb-8 tracking-widest">FULEN</h3>
-            <p class="text-[9px] text-gray-300 tracking-[0.3em] uppercase mb-10 border-b border-white/20 pb-4 inline-block">Official Reservation System</p>
-          
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm text-left max-w-2xl mx-auto">
-                <div>
-                    <p class="text-[9px] font-bold text-[#3eb4c8] uppercase tracking-widest mb-1">Address & Tel</p>
-                    <p class="text-gray-100 font-medium leading-relaxed mb-2">〒078-8345<br>北海道旭川市東光5条2丁目2-8</p>
-                    <a href="tel:09052232911" class="text-lg font-black tracking-widest">090-5223-2911</a>
-                    <p class="text-[10px] text-gray-400 mt-2">駐車場 4台完備</p>
-                </div>
-                <div>
-                     <p class="text-[9px] font-bold text-[#3eb4c8] uppercase tracking-widest mb-1">Opening & Closed</p>
-                     <div class="space-y-1 text-xs text-gray-100">
-                         <p>火水金土 / 09:30 - 19:00</p>
-                         <p>木曜日 / 09:30 - 22:00</p>
-                         <p>日・祝日 / 09:30 - 17:00</p>
-                         <p class="text-[#3eb4c8] font-bold mt-2 pt-2 border-t border-white/20">定休日: 月曜・第2火曜</p>
-                     </div>
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, doc, onSnapshot, setDoc, addDoc, updateDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-
-        const NOTIFICATION_CONFIG = {
-            gas_webapp_url: "https://script.google.com/macros/s/AKfycbxG6o8admmvSUsE0Cza2gXWRADDQNDmEv6VJJwG7oQLvRpm8OKJGjG6oAftTCN4Maif/exec" // ※後でGAS作成時に書き換えます
-        };
-        
-        // ★ 今回取得した合鍵をセット！
-        const firebaseConfig = {
-            apiKey: "AIzaSyCfiR-LrhgdcjT-rSXLIRI3tlC0LGhIjRQ",
-            authDomain: "hairsalon-fulen.firebaseapp.com",
-            projectId: "hairsalon-fulen",
-            storageBucket: "hairsalon-fulen.firebasestorage.app",
-            messagingSenderId: "294997014666",
-            appId: "1:294997014666:web:24cfd1cedeb78adf4e5573",
-            measurementId: "G-24XRQ5K9MR"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app); const auth = getAuth(app); 
-        const appId = "hairsalon-fulen"; // DBのパス名
-        
-        let reservationData = {}, bookingsList = [], isAdmin = false, isEmergencyStop = false, selectedMenus = [];
-        let selectedDate = ""; 
-        let selectedTime = ""; 
-        
-        let isTetrisMode = false;
-        let myChart = null;
-
-        // ★ FULEN様の新メニューマトリクスをセット
-        const menuData = [
-            { name: "カット（シャンプーなし）", time: 60, price: 3850, desc: "スタンダード", isCut: true },
-            { name: "カラーカット", time: 120, price: 8800, desc: "※全体カラーの場合、当日＋550円", includesCut: true },
-            { name: "パーマ", time: 120, price: 10450, desc: "※カットなし", isCut: false },
-            { name: "デジタルパーマ", time: 180, price: 13750, desc: "※カットなし", isCut: false },
-            { name: "カラーパーマ", time: 180, price: 14850, desc: "※カットなし", isCut: false },
-            { name: "縮毛矯正", time: 180, price: 14850, desc: "ダメージを抑えたワンランク上の縮毛矯正", isCut: false },
-            { name: "髪質改善縮毛矯正", time: 210, price: 17000, desc: "髪質改善特化", isCut: false },
-            { name: "トリートメント", time: 30, price: 4180, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+30分)が自動加算されます", isTreatment: true },
-            { name: "スパトリートメント", time: 40, price: 4950, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+30分)が自動加算されます", isTreatment: true },
-            { name: "髪質改善トリートメント", time: 90, price: 7000, desc: "シャンプー込み", isTreatment: false },
-            { name: "プラスブリーチ", time: 60, price: 5000, desc: "※カラーメニューに追加してください", isOption: true },
-            { name: "ダブル・トリプルカラー", time: 0, price: 3500, desc: "※長さによって3500円〜4500円。当日ご案内します", isStartingPrice: true, isOption: true },
-            { name: "メニュープラス", time: 25, price: 5000, desc: "追加オプション", isOption: true }
-        ];
-
-        const timeSlots = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30"];
-        
-        let autoHolidays = [];
-
-        window.onload = async () => { 
-            try {
-                const response = await fetch('https://holidays-jp.github.io/api/v1/date.json');
-                const holidayData = await response.json();
-                autoHolidays = Object.keys(holidayData); 
-            } catch (error) {
-                console.log('祝日データの取得に失敗', error);
-            }
-
-            initMenu(); 
-            signInAnonymously(auth);
-            onAuthStateChanged(auth, u => { if(u) startSync(); }); 
-        };
-
-        const startSync = () => {
-            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), (doc) => {
-                isEmergencyStop = doc.exists() ? doc.data().active : false;
-                document.getElementById('emergencyOverlay').style.display = (isEmergencyStop && !isAdmin) ? 'flex' : 'none';
-            });
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'slots'), snap => { snap.forEach(d => reservationData[d.id] = d.data().status); renderCalendar(); });
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), snap => { bookingsList = snap.docs.map(d => ({id:d.id, ...d.data()})); renderAdminBookings(); updateChart(); });
-        };
-
-        const initMenu = () => {
-            const list = document.getElementById('menuList');
-            list.innerHTML = "";
-            menuData.forEach((m) => {
-                const isSelected = selectedMenus.some(sm => sm.name === m.name);
-                const card = document.createElement('div'); 
-                card.className = `p-4 border-2 rounded-xl text-left cursor-pointer transition-colors relative ${isSelected ? 'border-[#3eb4c8] bg-cyan-50' : 'border-gray-200 bg-white hover:border-[#3eb4c8]'}`;
-                
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <h3 class="font-bold text-sm ${isSelected ? 'text-[#1e3a8a]' : 'text-gray-800'}">${m.name}</h3>
-                        <span class="text-[10px] text-gray-500 bg-gray-100 px-2 py-1 rounded-md ${isSelected ? 'bg-white text-[#3eb4c8]' : ''}">${m.time}分</span>
-                    </div>
-                    <p class="text-[10px] text-gray-400 mt-1">${m.desc}</p>
-                    <p class="text-[#1e3a8a] font-black mt-2">¥${m.price.toLocaleString()}${m.isStartingPrice ? '〜' : ''} <span class="text-[10px] text-gray-400 font-normal">（税込）</span></p>
-                    ${isSelected ? '<div class="absolute top-2 right-2 text-[#3eb4c8] font-black"><i class="fa-solid fa-circle-check"></i></div>' : ''}
-                `;
-                card.onclick = () => { 
-                    if (isSelected) {
-                        selectedMenus = selectedMenus.filter(sm => sm.name !== m.name);
-                    } else {
-                        const hasStandaloneCut = selectedMenus.some(sm => sm.isCut);
-                        const hasCutIncluded = selectedMenus.some(sm => sm.includesCut);
-
-                        if (m.isCut && hasCutIncluded) { alert("すでに「カット込み」のメニューが選択されています。"); return; }
-                        if (m.includesCut && hasStandaloneCut) { alert("カット単体のメニューがすでに選択されています。先にチェックを外してください。"); return; }
-                        if (m.isCut && hasStandaloneCut) { alert("カットメニューは複数選択できません。"); return; }
-                        selectedMenus.push(m);
-                    }
-                    initMenu();
-                    window.updateStep1Footer(); 
-                };
-                list.appendChild(card);
-            });
-        };
-
-        window.updateStep1Footer = () => {
-            const footer = document.getElementById('step1Footer');
-            if(selectedMenus.length > 0) {
-                footer.classList.remove('hidden');
-                let totalPrice = 0; let totalTime = 0; let hasStartingPrice = false;
-                
-                // ★ トリートメント単体かどうかをチェック
-                let hasBaseMenu = selectedMenus.some(m => !m.isTreatment && !m.isOption);
-                let hasTreatment = selectedMenus.some(m => m.isTreatment);
-
-                selectedMenus.forEach(m => { totalPrice += m.price; totalTime += m.time; if(m.isStartingPrice) hasStartingPrice = true; });
-
-                // トリートメントのみならシャンプー代＆時間を加算！
-                if (hasTreatment && !hasBaseMenu) {
-                    totalPrice += 800;
-                    totalTime += 30;
-                    document.getElementById('totalPriceDisplay').innerHTML = `¥${totalPrice.toLocaleString()}${hasStartingPrice ? '〜' : ''} <span class="text-xs text-gray-500 font-normal">（税込/シャンプー代込）</span>`;
-                } else {
-                    document.getElementById('totalPriceDisplay').innerHTML = `¥${totalPrice.toLocaleString()}${hasStartingPrice ? '〜' : ''} <span class="text-xs text-gray-500 font-normal">（税込）</span>`;
-                }
-
-                document.getElementById('totalTimeDisplay').innerText = `${totalTime}分`;
-            } else {
-                footer.classList.add('hidden');
-            }
-        };
-
-        window.goToStep2 = () => { window.changeStep(2); };
-        window.changeStep = (s) => { 
-            document.querySelectorAll('.step-content').forEach(c=>c.classList.remove('active')); 
-            document.getElementById(`step${s}`).classList.add('active'); 
-            
-            for(let i=1; i<=4; i++) {
-                const header = document.getElementById(`stepHeader${i}`);
-                if(i === s) {
-                    header.className = "flex-1 py-3 text-center border-b-2 border-[#3eb4c8] text-[#3eb4c8] font-black text-[10px] transition-all";
-                } else if(i < s) {
-                    header.className = "flex-1 py-3 text-center border-b-2 border-[#1e3a8a] text-[#1e3a8a] font-bold text-[10px] transition-all";
-                } else {
-                    header.className = "flex-1 py-3 text-center border-b-2 border-transparent text-gray-300 font-bold text-[10px] transition-all";
-                }
-            }
-            window.scrollTo(0, document.getElementById('reservation-section').offsetTop);
-        };
-
-        const renderCalendar = () => {
-            const body = document.getElementById('calendarBody'), head = document.getElementById('dateHeader');
-            if(!body || !head) return;
-            body.innerHTML = ''; head.innerHTML = '<th class="time-col sticky-left">TIME</th>';
-            
-            const dates = [];
-            const today = new Date();
-            const endDate = new Date(today.getFullYear(), today.getMonth() + 2, today.getDate()); 
-
-            let currentDate = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-            while (currentDate <= endDate) {
-                dates.push(new Date(currentDate));
-                currentDate.setDate(currentDate.getDate() + 1);
-            }
-
-            dates.forEach(d => {
-                if (d.getDay() === 5) { head.innerHTML += `<th class="time-col">TIME</th>`; }
-                const label = `${d.getMonth()+1}/${d.getDate()}`;
-                const dayStr = ['日','月','火','水','木','金','土'][d.getDay()];
-                let colorClass = 'text-[#1e3a8a]';
-                if(d.getDay() === 0) colorClass = 'text-red-500'; 
-                if(d.getDay() === 6) colorClass = 'text-blue-500'; 
-                head.innerHTML += `<th class="py-3 min-w-[80px] ${colorClass}"><div class="text-sm font-bold">${label}</div><div class="text-[10px]">(${dayStr})</div></th>`;
-            });
-
-            timeSlots.forEach(t => {
-                const tr = document.createElement('tr');
-                let rowHtml = `<td class="time-col sticky-left">${t}</td>`;
-                
-                dates.forEach(d => {
-                    if (d.getDay() === 5) { rowHtml += `<td class="time-col">${t}</td>`; }
-                    const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                    const slotId = `${dateStr}_${t}`;
-                    const status = reservationData[slotId] || 'ok';
-                    
-                    // ★ FULEN様 定休日ロジック（月曜・第2火曜）
-                    const isMonday = (d.getDay() === 1); 
-                    const isSecondTuesday = (d.getDay() === 2 && d.getDate() >= 8 && d.getDate() <= 14);
-                    const isHoliday = isMonday || isSecondTuesday;
-                    const isPublicHoliday = autoHolidays.includes(dateStr);
-
-                    const timeNum = parseInt(t.replace(':', ''), 10); 
-                    let isOutOfHours = false;
-
-                    if (d.getDay() === 4 && !isPublicHoliday) {
-                        if (timeNum >= 2200) isOutOfHours = true; // 木曜は22時まで
-                    } else if (d.getDay() === 0 || isPublicHoliday) {
-                        if (timeNum >= 1700) isOutOfHours = true; // 日祝は17時まで
-                    } else {
-                        if (timeNum >= 1900) isOutOfHours = true; // その他は19時まで
-                    }
-
-                    if (isHoliday) {
-                        rowHtml += `<td class="status-closed">休</td>`;
-                    } else if (isOutOfHours) {
-                        rowHtml += `<td class="status-closed text-gray-200 font-normal">ー</td>`;
-                    } else if (status !== 'ok') {
-                        rowHtml += `<td class="status-ng" onclick="window.unselectSlot('${dateStr}', '${t}')">×</td>`;
-                    } else {
-                        rowHtml += `<td class="status-ok hover:bg-[#f4eee1] transition-colors" onclick="window.selectSlot('${dateStr}', '${t}')">◎</td>`;
-                    }
-                });
-                tr.innerHTML = rowHtml;
-                body.appendChild(tr);
-            });
-        };
-
-        window.toggleTetrisMode = () => {
-            isTetrisMode = !isTetrisMode;
-            const btn = document.getElementById('tetrisBtn');
-            if (isTetrisMode) {
-                btn.className = "bg-gray-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
-                btn.innerHTML = '<i class="fa-solid fa-xmark text-base"></i> モードを終了する';
-                alert('【テトリスモードON：SNS集客チャンス！】\n\n① カレンダーをタップして手動で「◎（空き）」を作ります。\n② そのカレンダー画面をスマホでスクショ（撮影）します。\n③ Instagramのストーリーズ等で「急遽空きが出ました！早い者勝ち！」と投稿して空き枠を埋めましょう！');
-            } else {
-                btn.className = "bg-gradient-to-r from-purple-500 via-pink-500 to-orange-400 text-white font-bold py-2 md:py-3 px-3 md:px-5 rounded-lg shadow-md text-[10px] md:text-xs flex items-center gap-2 transition hover:scale-105 border border-white/50";
-                btn.innerHTML = '<i class="fa-solid fa-camera-retro text-base"></i> テトリスモード（SNS集客用）';
-            }
-        };
-
-        window.selectSlot = async (dateStr, timeStr) => {
-            if (isAdmin) {
-                if (!isTetrisMode) {
-                    alert('枠を手動でブロックするには、右上の「テトリスモード」をONにしてください。');
-                    return;
-                }
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ng' }); } catch (e) {}
-            } else {
-                selectedDate = dateStr; selectedTime = timeStr;
-                document.getElementById('selectedDateTimeDisplay').innerText = `${selectedDate} ${selectedTime}〜`;
-                window.changeStep(3);
-            }
-        };
-
-        window.unselectSlot = async (dateStr, timeStr) => {
-            if (isAdmin) {
-                if (!isTetrisMode) {
-                    alert('枠を手動で開放してインスタに上げるには、右上の「テトリスモード」をONにしてください。');
-                    return;
-                }
-                try { await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${dateStr}_${timeStr}`), { status: 'ok' }); } catch (e) {}
-            }
-        };
-
-        window.toggleSubmitBtn = () => { 
-            const isChecked = document.getElementById('agreeCheck').checked;
-            const btn = document.getElementById('finalSubmitBtn');
-            btn.disabled = !isChecked; 
-        };
-
-        window.submitBooking = async () => {
-            const name = document.getElementById('custName').value;
-            const tel = document.getElementById('custTel').value;
-            const email = document.getElementById('custEmail').value;
-            const source = document.getElementById('custSource').value;
-            
-            const btn = document.getElementById('finalSubmitBtn');
-            if (!name || !tel) { alert("お名前と電話番号を入力してください。"); return; }
-
-            btn.innerText = "送信中..."; btn.disabled = true;
-            let combinedMenuNames = selectedMenus.map(m => m.name).join(' ＋ ');
-            let combinedPrice = 0; let totalTime = 0;
-            
-            let hasBaseMenu = selectedMenus.some(m => !m.isTreatment && !m.isOption);
-            let hasTreatment = selectedMenus.some(m => m.isTreatment);
-
-            selectedMenus.forEach(m => { combinedPrice += m.price; totalTime += m.time; });
-
-            // ★ トリートメント単体時の最終データ加算
-            if (hasTreatment && !hasBaseMenu) {
-                combinedPrice += 800;
-                totalTime += 30;
-                combinedMenuNames += "（シャンプー追加）";
-            }
-
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'bookings'), {
-                    name: name, tel: tel, email: email, source: source, date: selectedDate, time: selectedTime,
-                    menu: combinedMenuNames, price: combinedPrice, totalTime: totalTime, status: '未承認', createdAt: serverTimestamp()
-                });
-
-                const slotsNeeded = Math.ceil(totalTime / 30); 
-                const startIndex = timeSlots.indexOf(selectedTime);
-                if (startIndex !== -1) {
-                    for (let i = 0; i < slotsNeeded; i++) {
-                        if (startIndex + i < timeSlots.length) {
-                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${selectedDate}_${timeSlots[startIndex + i]}`), { status: 'ng' });
-                        }
-                    }
-                }
-
-                await fetch(NOTIFICATION_CONFIG.gas_webapp_url, {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        type: 'new_booking',
-                        name: name,
-                        tel: tel,
-                        date: selectedDate,
-                        time: selectedTime,
-                        menu: combinedMenuNames 
-                    })
-                }).catch(e => console.log("GAS Not Connected Yet"));
-
-                window.changeStep(4);
-            } catch (error) {
-                alert("エラーが発生しました。通信環境の良いところで再度お試しください。");
-                btn.innerText = "仮予約を送信する"; btn.disabled = false;
-            }
-        };
-
-        const updateChart = () => {
-            if (!document.getElementById('menuChart')) return;
-            const ctx = document.getElementById('menuChart').getContext('2d');
-            
-            const counts = {};
-            bookingsList.forEach(b => {
-                if(b.status === 'キャンセル' || b.status === '否認') return;
-                const mainMenu = b.menu.split(' ＋ ')[0]; 
-                counts[mainMenu] = (counts[mainMenu] || 0) + 1;
-            });
-
-            if (myChart) myChart.destroy();
-            if(Object.keys(counts).length === 0) return;
-
-            myChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(counts),
-                    datasets: [{
-                        data: Object.values(counts),
-                        backgroundColor: ['#3b82f6', '#ff6b81', '#10b981', '#f59e0b', '#8b5cf6', '#3eb4c8', '#1e3a8a'],
-                        borderWidth: 0
-                    }]
-                },
-                options: { 
-                    responsive: true, 
-                    maintainAspectRatio: false, 
-                    cutout: '65%', 
-                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, font: {size: 11} } } } 
-                }
-            });
-        };
-
-        const renderAdminBookings = () => {
-            const listContainer = document.getElementById('adminBookingList');
-            if(!listContainer) return;
-            listContainer.innerHTML = '';
-            if (bookingsList.length === 0) {
-                listContainer.innerHTML = '<div class="text-center text-gray-400 py-10 bg-white rounded-2xl border border-gray-100 shadow-sm">現在、予約データはありません</div>';
-                return;
-            }
-            
-            const sortedList = [...bookingsList].sort((a,b) => new Date(b.createdAt?.toDate() || 0) - new Date(a.createdAt?.toDate() || 0));
-
-            sortedList.forEach(b => {
-                const tTime = b.totalTime || 30;
-                
-                let statusColor = 'bg-[#fef9c3] text-yellow-800'; 
-                if (b.status === '承認済') statusColor = 'bg-green-100 text-green-800';
-                if (b.status === '否認' || b.status === 'キャンセル') statusColor = 'bg-gray-200 text-gray-600';
-
-                const sourceHtml = b.source ? `<div class="inline-block px-3 py-1 mb-3 rounded-full border border-pink-200 bg-pink-50 text-pink-500 text-[10px] font-bold"><i class="fa-solid fa-magnifying-glass"></i> きっかけ：${b.source}</div>` : '';
-                const emailHtml = b.email ? `<p class="text-xs text-gray-600 mt-1"><i class="fas fa-envelope mr-2 text-gray-400"></i><a href="mailto:${b.email}" class="text-blue-500 hover:underline">${b.email}</a></p>` : '';
-
-                listContainer.innerHTML += `
-                    <div class="bg-white rounded-2xl border border-gray-200 shadow-sm p-5 md:p-6 relative mb-4 transition hover:shadow-md">
-                        
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="font-bold text-gray-800 text-sm md:text-base flex items-center gap-2">
-                                <i class="far fa-calendar-alt text-red-400 text-lg"></i>
-                                ${b.date} ${b.time} 〜 <span class="text-xs text-gray-500 font-normal">(計 ${tTime}分)</span>
-                            </div>
-                            <span class="${statusColor} text-[10px] md:text-xs font-black px-3 py-1 md:py-2 rounded-md shadow-sm">${b.status || '未承認'}</span>
-                        </div>
-                        
-                        <h4 class="font-black text-2xl text-gray-900 mb-3">${b.name} 様</h4>
-                        
-                        <p class="text-sm text-gray-600 mt-1"><i class="fas fa-phone mr-2 text-gray-400"></i><a href="tel:${b.tel}" class="text-blue-500 hover:underline font-bold">${b.tel}</a></p>
-                        ${emailHtml}
-                        
-                        <div class="mt-4">
-                            ${sourceHtml}
-                        </div>
-
-                        <div class="mt-2 p-4 bg-[#fff0f5] rounded-xl border border-pink-100">
-                            <p class="text-[10px] text-pink-400 font-bold mb-2">予約メニュー</p>
-                            <p class="text-sm md:text-base text-gray-800 font-black leading-relaxed">${b.menu}</p>
-                        </div>
-                        
-                        <div class="mt-5">
-                            <p class="text-[10px] text-gray-400 font-bold mb-2 flex items-center gap-1"><i class="fa-solid fa-pen"></i> 顧客カルテ（自動保存）</p>
-                            <textarea id="memo_${b.id}" class="w-full p-4 bg-gray-50 border border-gray-200 rounded-xl text-xs focus:ring-2 focus:ring-pink-300 outline-none transition" rows="3" placeholder="前回のメニュー、フルボ酸の反応、会話の内容などを自由にメモできます..." onblur="window.saveMemo('${b.id}', this.value)">${b.memo || ''}</textarea>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3 mt-5">
-                            <button onclick="window.updateStatus('${b.id}', '承認済')" class="bg-[#10b981] hover:bg-emerald-600 text-white font-bold py-3 md:py-4 rounded-xl text-xs md:text-sm shadow-md transition flex justify-center items-center gap-2"><i class="fa-solid fa-check"></i> 承認する</button>
-                            <button onclick="window.cancelBooking('${b.id}', '${b.date}', '${b.time}', ${tTime})" class="bg-[#9ca3af] hover:bg-gray-500 text-white font-bold py-3 md:py-4 rounded-xl text-xs md:text-sm shadow-md transition flex justify-center items-center gap-2"><i class="fa-solid fa-xmark"></i> 否認(枠開放)</button>
-                        </div>
-                        
-                        <button onclick="window.sendThankYouMail('${b.id}')" class="mt-3 w-full bg-gradient-to-r from-[#ff7e93] to-[#ff6b81] hover:from-[#ff6b81] hover:to-[#ff526a] text-white font-bold py-3 md:py-4 rounded-xl text-xs md:text-sm shadow-md transition flex justify-center items-center gap-2"><i class="fa-solid fa-envelope-open-text"></i> サンキューメール＆口コミ獲得</button>
-                    </div>
-                `;
-            });
-        };
-
-        window.saveMemo = async (id, text) => {
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { memo: text }); } catch(e) {}
-        };
-
-        window.updateStatus = async (id, status) => {
-            try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { status: status }); } catch(e) {}
-        };
-
-        window.cancelBooking = async (id, date, time, totalTime) => {
-            if(!confirm("この予約を否認（キャンセル）し、カレンダーの枠を再び「予約可能」に戻しますか？")) return;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'bookings', id), { status: '否認' });
-                const slotsNeeded = Math.ceil(totalTime / 30);
-                const startIndex = timeSlots.indexOf(time);
-                if (startIndex !== -1) {
-                    for (let i = 0; i < slotsNeeded; i++) {
-                        if (startIndex + i < timeSlots.length) {
-                            await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'slots', `${date}_${timeSlots[startIndex + i]}`), { status: 'ok' });
-                        }
-                    }
-                }
-                alert("枠を開放しました");
-            } catch(e) {}
-        };
-
-        window.sendThankYouMail = (id) => {
-            alert("「サンキューメール＆口コミ獲得」の自動送信機能は、EmailJSアカウントとの連携設定後に有効になります！");
-        };
-        
-        window.toggleAdminMode = (chk) => { 
-            if(chk) { 
-                document.getElementById('adminAuthModal').style.display = 'flex'; 
-            } else { 
-                isAdmin = false; 
-                document.getElementById('modeLabel').innerText='OFF'; 
-                document.getElementById('adminBookingSection').classList.add('hidden');
-                document.getElementById('emergencyBtn').classList.add('hidden');
-                document.getElementById('backToMenuBtn').classList.remove('hidden'); 
-                window.changeStep(1); 
-            } 
-        };
-
-        window.verifyAdmin = () => {
-            if(document.getElementById('adminPass').value === "1234") { 
-                isAdmin=true; 
-                document.getElementById('modeLabel').innerText='ON'; 
-                document.getElementById('adminAuthModal').style.display='none'; 
-                
-                document.getElementById('adminBookingSection').classList.remove('hidden'); 
-                document.getElementById('emergencyBtn').classList.remove('hidden');
-                document.getElementById('backToMenuBtn').classList.add('hidden');
-
-                setTimeout(() => updateChart(), 100);
-
-                window.changeStep(2);
-                document.getElementById('adminPass').value = "";
-            } else { 
-                alert("パスワードが違います"); 
-            }
-        };
-
-        window.toggleEmergencyStop = async () => {
-            const newState = !isEmergencyStop;
-            try {
-                await setDoc(doc(db, 'artifacts', appId, 'public', 'data', 'settings', 'emergency'), { active: newState });
-                const btn = document.getElementById('emergencyBtn');
-                if(newState) {
-                    btn.className = "bg-gray-600 hover:bg-gray-700 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md active:scale-95 transition-all flex items-center gap-1";
-                    btn.innerHTML = "停止中(再開する)";
-                } else {
-                    btn.className = "bg-red-600 hover:bg-red-700 text-white text-[10px] font-black px-2 py-1 rounded-md shadow-md active:scale-95 transition-all flex items-center gap-1";
-                    btn.innerHTML = "稼働中(緊急停止)";
-                }
-            } catch(e) {
-                alert("状態の変更に失敗しました");
-            }
-        };
-    </script>
+<div class="container">
+  <h2>フレン 予約フォーム</h2>
+  <form id="reservationForm">
+    <label for="name">お名前</label>
+    <input type="text" id="name" name="name" required placeholder="例：山田 花子">
+
+    <label for="datetime">ご希望の日時</label>
+    <input type="datetime-local" id="datetime" name="datetime" required>
+
+    <label for="menu">ご希望のメニュー</label>
+    <select id="menu" name="menu" required>
+      <option value="">選択してください</option>
+      <option value="カット">カット</option>
+      <option value="カラー">カラー</option>
+      <option value="カット＋カラー">カット＋カラー</option>
+      <option value="パーマ">パーマ</option>
+      <option value="トリートメント">トリートメント</option>
+    </select>
+
+    <button type="submit">予約を送信する</button>
+  </form>
+  <div id="message"></div>
+</div>
+
+<script>
+  // ★ここにGASの「ウェブアプリのURL」を貼り付けます★
+  const endpoint = "https://script.google.com/macros/s/AKfycbzejEeCbhMKFZMTOOQwThfx1xFyni0QVpO4EQkOu9LB07vr5mrUlg-2Ps34ETwPgzNO/exec";
+
+  document.getElementById('reservationForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // 画面のチラつきを防ぐ
+    
+    const submitButton = e.target.querySelector('button');
+    submitButton.disabled = true;
+    submitButton.textContent = "送信中...";
+
+    const data = {
+      name: document.getElementById('name').value,
+      datetime: document.getElementById('datetime').value,
+      menu: document.getElementById('menu').value
+    };
+
+    fetch(endpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'text/plain', // GASエラー回避の魔法のおまじない
+      },
+      body: JSON.stringify(data)
+    })
+    .then(response => {
+      document.getElementById('message').innerText = "予約リクエストを送信しました！";
+      document.getElementById('message').classList.remove('error');
+      document.getElementById('reservationForm').reset();
+    })
+    .catch(error => {
+      document.getElementById('message').innerText = "通信エラーが発生しました。もう一度お試しください。";
+      document.getElementById('message').classList.add('error');
+    })
+    .finally(() => {
+      submitButton.disabled = false;
+      submitButton.textContent = "予約を送信する";
+    });
+  });
+</script>
 </body>
 </html>
