@@ -444,10 +444,10 @@
                     const slotId = `${dateStr}_${t}`;
                     const status = reservationData[slotId] || 'ok';
                     
-                    const isMonday = (d.getDay() === 1); 
-                    const isSecondTuesday = (d.getDay() === 2 && d.getDate() >= 8 && d.getDate() <= 14);
-                    const isThirdSunday = (d.getDay() === 0 && d.getDate() >= 15 && d.getDate() <= 21);
-                    const isHoliday = isMonday || isSecondTuesday || isThirdSunday;
+                    // HTML内の dates.forEach ループ内にある定休日判定を以下に差し替え
+const isMonday = (d.getDay() === 1); 
+const isSecondTuesday = (d.getDay() === 2 && d.getDate() >= 8 && d.getDate() <= 14);
+const isHoliday = isMonday || isSecondTuesday; // 第3日曜日の判定を削除
                     const isPublicHoliday = autoHolidays.includes(dateStr);
 
                     const timeNum = parseInt(t.replace(':', ''), 10); 
