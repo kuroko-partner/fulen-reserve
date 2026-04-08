@@ -295,20 +295,25 @@
         let myChart = null;
 
         const menuData = [
-            { name: "カット(シャンプーなし)", time: 60, price: 3850, desc: "スタンダード", isCut: true },
-            { name: "小学生以下(キッズカット)", time: 30, price: 2200, desc: "シャンプーなし", isCut: true },
-            { name: "中学生以上(U24)", time: 60, price: 2750, desc: "シャンプーなし", isCut: true },
-            { name: "カラーカット", time: 120, price: 8800, desc: "※全体カラーの場合、当日＋550円となります", includesCut: true },
-            { name: "ブリーチ追加", time: 90, price: 3850, desc: "カラー等のメニューにプラスしてご選択ください", isStartingPrice: true },
-            { name: "パーマ(カット込)", time: 120, price: 10450, desc: "ダメージを最小限に抑えたパーマ", includesCut: true },
-            { name: "デジタルパーマ(カット込)", time: 150, price: 13750, desc: "持ちの良いデジタルパーマ", includesCut: true },
-            { name: "カラーパーマ(カット込)", time: 180, price: 14850, desc: "※全体カラーの場合、当日＋550円となります", includesCut: true },
-            { name: "縮毛矯正", time: 180, price: 14850, desc: "ダメージを抑えたワンランク上の縮毛矯正" },
-            { name: "学生縮毛矯正", time: 180, price: 12650, desc: "学生限定", isStartingPrice: true },
-            { name: "トリートメント", time: 30, price: 4180, desc: "※他メニューとセットの場合は当日割引になります" },
-            { name: "スパトリートメント", time: 30, price: 4950, desc: "※他メニューとセットの場合は当日割引になります" },
-            { name: "スパトリートメントフレン", time: 30, price: 5830, desc: "※他メニューとセットの場合は当日割引になります" }
-        ];
+    // --- 基本メニュー ---
+    { name: "カット（シャンプーなし）", time: 60, price: 3850, desc: "スタンダード", isCut: true },
+    { name: "カラーカット", time: 120, price: 8800, desc: "※全体カラーの場合、当日＋550円", includesCut: true },
+    { name: "パーマ", time: 120, price: 10450, desc: "※カットなし", isCut: false },
+    { name: "デジタルパーマ", time: 180, price: 13750, desc: "※カットなし", isCut: false },
+    { name: "カラーパーマ", time: 180, price: 14850, desc: "※カットなし", isCut: false },
+    { name: "縮毛矯正", time: 180, price: 14850, desc: "ダメージを抑えたワンランク上の縮毛矯正", isCut: false },
+    { name: "髪質改善縮毛矯正", time: 210, price: 17000, desc: "髪質改善特化", isCut: false },
+
+    // --- トリートメント・スパ（単体選択時に自動加算するロジック用） ---
+    { name: "トリートメント", time: 30, price: 4180, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+30分)が自動加算されます", isTreatment: true },
+    { name: "スパトリートメント", time: 40, price: 4950, desc: "※単体でのご予約はシャンプー代(+800円)と時間(+20分)が自動加算されます", isTreatment: true },
+    { name: "髪質改善トリートメント", time: 90, price: 7000, desc: "シャンプー込み", isTreatment: false },
+
+    // --- オプション（他メニューと組み合わせ必須） ---
+    { name: "プラスブリーチ", time: 60, price: 5000, desc: "※カラーメニューに追加してください", isOption: true },
+    { name: "ダブル・トリプルカラー", time: 0, price: 3500, desc: "※長さによって3500円〜4500円。当日ご案内します", isStartingPrice: true, isOption: true },
+    { name: "メニュープラス", time: 25, price: 5000, desc: "追加オプション", isOption: true }
+];
 
         const timeSlots = ["09:30", "10:00", "10:30", "11:00", "11:30", "12:00", "12:30", "13:00", "13:30", "14:00", "14:30", "15:00", "15:30", "16:00", "16:30", "17:00", "17:30", "18:00", "18:30", "19:00", "19:30", "20:00", "20:30", "21:00", "21:30"];
         
